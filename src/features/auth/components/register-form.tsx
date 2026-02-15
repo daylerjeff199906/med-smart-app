@@ -280,7 +280,7 @@ export function RegisterForm() {
         <p className="text-sm text-muted-foreground">
           {t("auth.register.haveAccount")}{" "}
           <Link href={getLocalizedRoute(ROUTES.LOGIN, locale)} className="font-semibold text-primary hover:underline">
-            {t("auth.login")}
+            {t("auth.register.login")}
           </Link>
         </p>
       </div>
