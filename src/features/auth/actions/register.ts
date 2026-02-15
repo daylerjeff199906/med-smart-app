@@ -36,7 +36,8 @@ export async function registerAction(
     const supabase = await createClient();
 
     const redirectPath = getLocalizedRoute(ROUTES.LOGIN, locale);
-    // Crear usuario en Supabase Auth
+
+    // Crear usuario en Supabase Auth con metadatos
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -44,7 +45,6 @@ export async function registerAction(
         data: {
           first_name: firstName,
           last_name: lastName,
-          full_name: `${firstName} ${lastName}`, // Maintain for backward compatibility if needed
         },
         emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}${redirectPath}`,
       },
@@ -65,26 +65,54 @@ export async function registerAction(
       };
     }
 
-    // El perfil se crea automáticamente por el trigger con first_name y last_name
-    // Esperamos un momento para que el trigger se ejecute
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Obtener el perfil creado para confirmar estado de onboarding
+    console.log(authData.user.id)
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("onboarding_completed, first_name, last_name")
+      .select("onboarding_completed, first_name, last_name, email")
       .eq("id", authData.user.id)
       .single();
+    console.log(profile)
 
     if (profileError) {
       console.error("Profile fetch error:", profileError);
+      // Si el perfil no se creó, intentamos crearlo manualmente
+      const { error: insertError } = await supabase
+        .from("profiles")
+        .insert({
+          id: authData.user.id,
+          email: authData.user.email!,
+          first_name: firstName,
+          last_name: lastName,
+          onboarding_completed: false,
+        });
+
+      if (insertError) {
+        console.error("Profile insert error:", insertError);
+      }
+    }
+
+    // Si el perfil existe pero no tiene nombres, actualizarlos
+    if (profile && (!profile.first_name || !profile.last_name)) {
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+        })
+        .eq("id", authData.user.id);
+
+      if (updateError) {
+        console.error("Profile update error:", updateError);
+      }
     }
 
     // Crear sesión encriptada
     await createSession(
       authData.user.id,
       authData.user.email!,
-      (profile as { onboarding_completed?: boolean } | null)?.onboarding_completed ?? false
+      profile?.onboarding_completed ?? false
     );
 
     // Enviar email de bienvenida

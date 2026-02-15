@@ -63,12 +63,10 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
         const userId = session.user.id;
         const supabase = await createClient();
 
-        // Step 3: Update profile table (identity information)
+        // Step 3: Update profile table (solo fecha de nacimiento y género)
         const { error: profileError } = await supabase
             .from("profiles")
             .update({
-                first_name: data.firstName,
-                last_name: data.lastName,
                 birth_date: data.birthDate,
                 gender: data.gender,
                 onboarding_completed: true,

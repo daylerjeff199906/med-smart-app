@@ -56,34 +56,50 @@
         "subtitle": "To make BEQUI useful from day 1, we need some basic details.",
         "identity": {
             "title": "Identity",
+            "subtitle": "Let's start with your basic information to personalize your experience.",
             "firstName": "First Name",
             "lastName": "Last Name",
-            "birthDate": "Birth Date",
+            "birthDate": "What is your birth date?",
             "gender": {
-                "label": "Biological Gender",
+                "label": "What is your gender?",
+                "placeholder": "Select",
                 "male": "Male",
                 "female": "Female",
-                "other": "Other"
+                "other": "Other",
+                "prefer_not_to_say": "Prefer not to say"
             }
         },
         "biometry": {
-            "title": "Basic Biometry",
-            "weight": "Weight (kg)",
-            "height": "Height (cm)"
+            "title": "How is your biometry?",
+            "subtitle": "This data allows us to monitor your health effectively.",
+            "weight": "What is your current weight? (kg)",
+            "height": "What is your height? (cm)",
+            "bloodType": "What is your blood type?",
+            "bloodTypePlaceholder": "Optional"
         },
         "conditions": {
-            "title": "Critical Conditions",
-            "allergies": "Allergies (medication or food)",
-            "chronicConditions": "Chronic conditions",
+            "title": "Your Health History",
+            "subtitle": "Select if you have any of these common conditions.",
+            "allergies": "Do you have any allergies we should know about?",
+            "allergiesPlaceholder": "Penicillin, peanuts, dust...",
+            "chronicConditions": "Do you have any chronic conditions?",
             "diabetes": "Diabetes",
-            "hypertension": "Hypertension"
+            "diabetesDetail": "Blood glucose",
+            "hypertension": "Pressure",
+            "hypertensionDetail": "Hypertension"
         },
         "emergency": {
-            "title": "Emergency Contacts",
-            "name": "Contact Name",
-            "phone": "Phone",
-            "relationship": "Relationship"
+            "title": "Emergency Contact",
+            "subtitle": "Your safety comes first. Who do we contact in an emergency?",
+            "name": "Who should we contact in case of emergency?",
+            "namePlaceholder": "Enter full name",
+            "phone": "What is their phone number?",
+            "relationship": "What is their relationship to you?",
+            "relationshipPlaceholder": "Mother, Husband..."
         },
-        "button": "Complete Profile"
+        "button": "Complete Profile",
+        "next": "Continue Step",
+        "back": "Back",
+        "saving": "Saving..."
     }
 }

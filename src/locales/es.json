@@ -56,34 +56,50 @@
         "subtitle": "Para que BEQUI sea útil desde el día 1, necesitamos algunos detalles básicos.",
         "identity": {
             "title": "Identidad",
+            "subtitle": "Comencemos con tu información básica para personalizar tu experiencia.",
             "firstName": "Nombres",
             "lastName": "Apellidos",
-            "birthDate": "Fecha de nacimiento",
+            "birthDate": "¿Cuál es tu fecha de nacimiento?",
             "gender": {
-                "label": "Género biológico",
+                "label": "¿Cuál es tu género?",
+                "placeholder": "Selecciona",
                 "male": "Masculino",
                 "female": "Femenino",
-                "other": "Otro"
+                "other": "Otro",
+                "prefer_not_to_say": "Prefiero no decir"
             }
         },
         "biometry": {
-            "title": "Biometría básica",
-            "weight": "Peso (kg)",
-            "height": "Altura (cm)"
+            "title": "¿Cómo está tu biometría?",
+            "subtitle": "Estos datos nos permiten monitorear tu salud de manera efectiva.",
+            "weight": "¿Cuál es tu peso actual? (kg)",
+            "height": "¿Cuál es tu estatura? (cm)",
+            "bloodType": "¿Cuál es tu tipo de sangre?",
+            "bloodTypePlaceholder": "Opcional"
         },
         "conditions": {
-            "title": "Condiciones Críticas",
-            "allergies": "Alergias (medicamentosas o alimentarias)",
-            "chronicConditions": "Enfermedades crónicas",
+            "title": "Tu Historial de Salud",
+            "subtitle": "Selecciona si tienes alguna de estas condiciones comunes.",
+            "allergies": "¿Tienes alguna alergia que debamos conocer?",
+            "allergiesPlaceholder": "Penicilina, maní, polvo...",
+            "chronicConditions": "¿Tienes alguna condición crónica?",
             "diabetes": "Diabetes",
-            "hypertension": "Hipertensión"
+            "diabetesDetail": "Glucosa en sangre",
+            "hypertension": "Presión",
+            "hypertensionDetail": "Hipertensión"
         },
         "emergency": {
-            "title": "Contactos de Emergencia",
-            "name": "Nombre del contacto",
-            "phone": "Teléfono",
-            "relationship": "Parentesco/Relación"
+            "title": "Contacto de Emergencia",
+            "subtitle": "Tu seguridad es lo primero. ¿A quién contactamos en una urgencia?",
+            "name": "¿A quién contactamos en caso de emergencia?",
+            "namePlaceholder": "Escribe el nombre completo",
+            "phone": "¿Cuál es su número de teléfono?",
+            "relationship": "¿Qué relación tiene contigo?",
+            "relationshipPlaceholder": "Madre, Esposo..."
         },
-        "button": "Completar perfil"
+        "button": "Completar perfil",
+        "next": "Continuar Paso",
+        "back": "Regresar",
+        "saving": "Finalizando..."
     }
 }

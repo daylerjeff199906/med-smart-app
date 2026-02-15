@@ -164,9 +164,15 @@ CREATE TRIGGER update_profiles_updated_at
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Insert profile with email from auth.users
-    INSERT INTO public.profiles (id, email, onboarding_completed)
-    VALUES (NEW.id, NEW.email, FALSE);
+    -- Insert profile with email and names from metadata
+    INSERT INTO public.profiles (id, email, first_name, last_name, onboarding_completed)
+    VALUES (
+        NEW.id, 
+        NEW.email,
+        COALESCE(NEW.raw_user_meta_data->>'first_name', NULL),
+        COALESCE(NEW.raw_user_meta_data->>'last_name', NULL),
+        FALSE
+    );
     
     -- Insert empty health data record
     INSERT INTO public.health_data (profile_id)
