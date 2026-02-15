@@ -40,6 +40,14 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
 
     if (authError) {
       console.error("Auth error:", authError);
+
+      if (authError.code === 'email_not_confirmed') {
+        return {
+          success: false,
+          error: "email_not_confirmed",
+        };
+      }
+
       return {
         success: false,
         error: "Invalid email or password",

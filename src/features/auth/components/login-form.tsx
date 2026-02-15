@@ -52,7 +52,11 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       const result = await loginAction(values);
 
       if (!result.success) {
-        setError(result.error || "An error occurred");
+        if (result.error === "email_not_confirmed") {
+          setError(t("auth.login.emailNotConfirmed"));
+        } else {
+          setError(result.error || "An error occurred");
+        }
         return;
       }
 

@@ -8,7 +8,8 @@
             "button": "Sign in",
             "noAccount": "Don't have an account?",
             "register": "Sign up",
-            "forgotPassword": "Forgot password?"
+            "forgotPassword": "Forgot password?",
+            "emailNotConfirmed": "Please confirm your email address before signing in."
         },
         "register": {
             "title": "Create an account",
