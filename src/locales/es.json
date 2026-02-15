@@ -13,7 +13,8 @@
         "register": {
             "title": "Crea tu cuenta",
             "subtitle": "Regístrate para comenzar",
-            "fullName": "Nombre completo",
+            "firstName": "Nombres",
+            "lastName": "Apellidos",
             "email": "Email",
             "password": "Contraseña",
             "confirmPassword": "Confirmar contraseña",
@@ -56,7 +57,7 @@
         "identity": {
             "title": "Identidad",
             "fullName": "Nombre completo",
-            "age": "Edad",
+            "birthDate": "Fecha de nacimiento",
             "gender": {
                 "label": "Género biológico",
                 "male": "Masculino",

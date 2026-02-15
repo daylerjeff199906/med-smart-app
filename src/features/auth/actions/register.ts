@@ -69,7 +69,19 @@ export async function registerAction(
     // Pero necesitamos esperar un momento para que el trigger se ejecute
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Obtener el perfil creado
+    // Actualizar el perfil con el nombre completo
+    const fullName = `${firstName} ${lastName}`;
+    const { error: profileUpdateError } = await supabase
+      .from("profiles")
+      .update({ full_name: fullName })
+      .eq("id", authData.user.id);
+
+    if (profileUpdateError) {
+      console.error("Profile update error:", profileUpdateError);
+      // No fallamos el registro por esto, continuamos
+    }
+
+    // Obtener el perfil actualizado
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("onboarding_completed")

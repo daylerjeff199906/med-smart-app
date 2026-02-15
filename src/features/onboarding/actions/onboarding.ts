@@ -66,8 +66,7 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
         // Step 3: Update profile table (identity information)
         const { error: profileError } = await (supabase.from("profiles") as any)
             .update({
-                first_name: data.firstName,
-                last_name: data.lastName,
+                full_name: data.fullName,
                 birth_date: data.birthDate,
                 gender: data.gender,
                 onboarding_completed: true,

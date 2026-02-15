@@ -18,8 +18,7 @@ export type Gender = z.infer<typeof GenderEnum>;
  */
 export const onboardingSchema = z.object({
     // Identity Information
-    firstName: z.string().min(2, "First name is too short").max(100, "First name is too long"),
-    lastName: z.string().min(2, "Last name is too short").max(100, "Last name is too long"),
+    fullName: z.string().min(2, "Full name is too short").max(255, "Full name is too long"),
     birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)"),
     gender: GenderEnum,
 
