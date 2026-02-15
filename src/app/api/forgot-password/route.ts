@@ -1,5 +1,4 @@
-import { createAdminClient } from '@/utils/supabase/admin'
-import { sendPasswordResetEmail } from '@/services/email'
+import { createClient } from '@/utils/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -13,42 +12,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
-    // Generate the password reset link
-    const { data, error } = await supabase.auth.admin.generateLink({
-      type: 'recovery',
-      email: email,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=${encodeURIComponent('/forgot-password?type=recovery&code=valid')}`
-      }
+    // Redirigir al usuario a la página de restablecer contraseña una vez que haga clic en el link
+    // En este caso, redirigimos a /reset-password (ajustar según sea necesario)
+    const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`
+
+    // Supabase manejará el envío del correo de recuperación
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
     })
 
     if (error) {
-      console.error('Error generating reset link:', error)
+      console.error('Error requesting password reset:', error)
       return NextResponse.json(
         { error: error.message },
         { status: 400 }
-      )
-    }
-
-    if (!data || !data.properties?.action_link) {
-      return NextResponse.json(
-        { error: 'Could not generate action link' },
-        { status: 500 }
-      )
-    }
-
-    // Send the email using Resend
-    const emailResult = await sendPasswordResetEmail({
-      email,
-      resetLink: data.properties.action_link
-    })
-
-    if (!emailResult.success) {
-      return NextResponse.json(
-        { error: 'Error sending email' },
-        { status: 500 }
       )
     }
 

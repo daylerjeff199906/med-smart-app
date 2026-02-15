@@ -5,7 +5,7 @@ import { getSession } from "@/lib/session";
 import { ROUTES, getLocalizedRoute } from "@/lib/routes";
 
 export const metadata: Metadata = {
-  title: "MedSmart | Smart Medical Management",
+  title: "BEQUI | Smart Medical Management",
   description: "Manage your health with the most advanced medical management platform.",
 };
 
@@ -51,7 +51,7 @@ export default async function PortalPage({ params }: PortalPageProps): Promise<R
                 <path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h5v5c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2h-2z" />
               </svg>
             </div>
-            <span className="tracking-tight text-foreground">MedSmart</span>
+            <span className="tracking-tight text-foreground">BEQUI</span>
           </div>
 
           <nav className="flex items-center gap-6">
@@ -154,10 +154,10 @@ export default async function PortalPage({ params }: PortalPageProps): Promise<R
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-10 md:flex-row border-t border-border/50 pt-16">
             <div className="flex items-center gap-2 text-muted-foreground font-bold text-xl grayscale opacity-60">
-              <span className="tracking-tight italic">MedSmart</span>
+              <span className="tracking-tight italic">BEQUI</span>
             </div>
             <p className="text-sm text-muted-foreground order-last md:order-none">
-              © {new Date().getFullYear()} MedSmart. All rights reserved.
+              © {new Date().getFullYear()} BEQUI. All rights reserved.
             </p>
             <div className="flex gap-8">
               <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Privacy</a>

@@ -3,7 +3,7 @@ import { LoginForm } from "@/features/auth/components/login-form";
 import { ROUTES, getLocalizedRoute } from "@/lib/routes";
 
 export const metadata: Metadata = {
-  title: "Sign In | MedSmart",
+  title: "Sign In | BEQUI",
   description: "Sign in to your account",
 };
 

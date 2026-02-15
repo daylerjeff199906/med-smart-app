@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "MedSmart App",
-    template: "%s | MedSmart",
+    default: "BEQUI App",
+    template: "%s | BEQUI",
   },
   description: "A modern Next.js application with authentication and onboarding",
   keywords: ["nextjs", "react", "authentication", "supabase"],
-  authors: [{ name: "MedSmart" }],
-  creator: "MedSmart Team",
+  authors: [{ name: "BEQUI" }],
+  creator: "BEQUI Team",
 };
 
 export const viewport: Viewport = {

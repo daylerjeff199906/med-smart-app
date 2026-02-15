@@ -5,7 +5,7 @@ import { OnboardingForm } from "@/features/onboarding/components/onboarding-form
 import { ROUTES, getLocalizedRoute } from "@/lib/routes";
 
 export const metadata: Metadata = {
-  title: "Onboarding | MedSmart",
+  title: "Onboarding | BEQUI",
   description: "Complete your profile setup",
 };
 
@@ -51,7 +51,7 @@ export default async function OnboardingPage({ params }: OnboardingPageProps) {
                 <path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h5v5c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2h-2z" />
               </svg>
             </div>
-            <span>MedSmart</span>
+            <span>BEQUI</span>
           </div>
           <span className="text-sm font-medium text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-border/50">
             {session.user.email}

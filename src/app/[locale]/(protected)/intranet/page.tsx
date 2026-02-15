@@ -5,7 +5,7 @@ import { ROUTES, getLocalizedRoute } from "@/lib/routes";
 import { logoutAction } from "@/features/auth/actions/logout";
 
 export const metadata: Metadata = {
-  title: "Dashboard | MedSmart",
+  title: "Dashboard | BEQUI",
   description: "Your personal medical dashboard",
 };
 
@@ -53,7 +53,7 @@ export default async function IntranetPage({ params }: IntranetPageProps): Promi
                 <path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h5v5c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2h-2z" />
               </svg>
             </div>
-            <span>MedSmart Intranet</span>
+            <span>BEQUI Intranet</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-border/50">
