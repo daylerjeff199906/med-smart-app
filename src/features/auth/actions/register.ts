@@ -1,0 +1,104 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import { createSession } from "@/lib/session";
+import { sendWelcomeEmail } from "@/lib/resend";
+import { registerSchema, type RegisterInput } from "@/features/auth/types/auth";
+
+export interface RegisterResult {
+  success: boolean;
+  error?: string;
+  message?: string;
+}
+
+/**
+ * Server Action para registro de usuarios con envío de email de bienvenida
+ */
+export async function registerAction(input: RegisterInput): Promise<RegisterResult> {
+  try {
+    // Validar input con Zod
+    const validation = registerSchema.safeParse(input);
+    
+    if (!validation.success) {
+      const errorMessage = validation.error.issues
+        .map((issue) => issue.message)
+        .join(", ");
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+
+    const { email, password, fullName } = validation.data;
+    const supabase = await createClient();
+
+    // Crear usuario en Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
+      },
+    });
+
+    if (authError) {
+      console.error("Auth error:", authError);
+      return {
+        success: false,
+        error: authError.message,
+      };
+    }
+
+    if (!authData.user) {
+      return {
+        success: false,
+        error: "Failed to create user",
+      };
+    }
+
+    // El perfil se crea automáticamente por el trigger
+    // Pero necesitamos esperar un momento para que el trigger se ejecute
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Obtener el perfil creado
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", authData.user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Profile fetch error:", profileError);
+      // No fallamos el registro por esto, continuamos
+    }
+
+    // Crear sesión encriptada
+    await createSession(
+      authData.user.id,
+      authData.user.email!,
+      profile?.onboarding_completed ?? false
+    );
+
+    // Enviar email de bienvenida
+    const emailResult = await sendWelcomeEmail(email, fullName);
+    
+    if (!emailResult.success) {
+      console.error("Failed to send welcome email:", emailResult.error);
+      // No fallamos el registro si el email falla, solo logueamos
+    }
+
+    return {
+      success: true,
+      message: "Registration successful! Please check your email to verify your account.",
+    };
+  } catch (error) {
+    console.error("Registration error:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
