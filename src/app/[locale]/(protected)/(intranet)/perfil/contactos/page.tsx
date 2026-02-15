@@ -41,15 +41,8 @@ export default async function EmergencyContactsPage({ params }: EmergencyContact
 
   return (
     <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Contactos de Emergencia</h1>
-        <p className="text-slate-500 mt-1">
-          Gestiona las personas a contactar en caso de emergencia médica
-        </p>
-      </div>
-      
-      <EmergencyContactsForm 
-        defaultValues={initialData} 
+      <EmergencyContactsForm
+        defaultValues={initialData}
         locale={locale}
       />
     </div>

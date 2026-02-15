@@ -41,15 +41,8 @@ export default async function HealthDataPage({ params }: HealthDataPageProps) {
 
   return (
     <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Datos Médicos</h1>
-        <p className="text-slate-500 mt-1">
-          Administra tu información de salud y condiciones médicas
-        </p>
-      </div>
-      
-      <HealthDataForm 
-        defaultValues={initialData} 
+      <HealthDataForm
+        defaultValues={initialData}
         locale={locale}
       />
     </div>
