@@ -65,32 +65,18 @@ export async function registerAction(
       };
     }
 
-    // El perfil se crea automáticamente por el trigger
-    // Pero necesitamos esperar un momento para que el trigger se ejecute
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    // El perfil se crea automáticamente por el trigger con first_name y last_name
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Actualizar el perfil con el nombre completo
-    const fullName = `${firstName} ${lastName}`;
-    const { error: profileUpdateError } = await supabase
+    // Obtener el perfil creado para confirmar estado de onboarding
+    const { data: profile, error: profileError } = await (supabase
       .from("profiles")
-      .update({ full_name: fullName })
-      .eq("id", authData.user.id);
-
-    if (profileUpdateError) {
-      console.error("Profile update error:", profileUpdateError);
-      // No fallamos el registro por esto, continuamos
-    }
-
-    // Obtener el perfil actualizado
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("onboarding_completed")
+      .select("onboarding_completed, first_name, last_name") as any)
       .eq("id", authData.user.id)
       .single();
 
     if (profileError) {
       console.error("Profile fetch error:", profileError);
-      // No fallamos el registro por esto, continuamos
     }
 
     // Crear sesión encriptada

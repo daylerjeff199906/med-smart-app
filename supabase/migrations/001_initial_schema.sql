@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     
     -- Basic Identity Information
-    full_name VARCHAR(255),                              -- User's complete legal name
+    first_name VARCHAR(100),                            -- User's first name
+    last_name VARCHAR(100),                             -- User's last name
     avatar_url TEXT,                                     -- Profile image URL (storage bucket)
     birth_date DATE,                                     -- Date of birth for age calculations
     gender gender_type,                                  -- Gender identity from enum
@@ -240,9 +241,14 @@ CREATE TRIGGER update_emergency_contacts_updated_at
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Insert basic profile record
-    INSERT INTO public.profiles (id, onboarding_completed)
-    VALUES (NEW.id, FALSE);
+    -- Insert basic profile record using metadata if available
+    INSERT INTO public.profiles (id, first_name, last_name, onboarding_completed)
+    VALUES (
+        NEW.id, 
+        NEW.raw_user_meta_data->>'first_name',
+        NEW.raw_user_meta_data->>'last_name',
+        FALSE
+    );
     
     -- Insert empty health data record (will be populated during onboarding)
     INSERT INTO public.health_data (profile_id)
