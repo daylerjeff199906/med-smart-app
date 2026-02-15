@@ -32,6 +32,11 @@ export function useTranslation() {
                 result = result[key];
             }
 
+            if (typeof result !== "string") {
+                console.warn(`Translation key "${path}" resolved to an object instead of a string.`);
+                return path;
+            }
+
             return result;
         },
         [locale]
