@@ -66,7 +66,6 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
     try {
       const result = await resetPasswordAction({
-        token,
         password: values.password,
       });
 

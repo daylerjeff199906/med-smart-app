@@ -1,9 +1,8 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 
 interface ResetPasswordInput {
-  token: string;
   password: string;
 }
 
@@ -19,19 +18,29 @@ export async function resetPasswordAction(
   input: ResetPasswordInput
 ): Promise<ResetPasswordResult> {
   try {
-    const { token, password } = input;
+    const { password } = input;
 
-    if (!token || !password) {
+    if (!password) {
       return {
         success: false,
-        error: "Invalid input",
+        error: "Password is required",
       };
     }
 
-    // Note: Supabase handles the token verification via URL in the client
-    // Here we would need to verify the token and update the password
-    // For now, this is a placeholder that should be implemented
-    // based on your specific Supabase setup
+    const supabase = await createClient();
+
+    // Actualizar la contraseña del usuario actualmente autenticado (vía el link de reset)
+    const { error } = await supabase.auth.updateUser({
+      password: password,
+    });
+
+    if (error) {
+      console.error("Reset password error:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
 
     return {
       success: true,
@@ -44,3 +53,4 @@ export async function resetPasswordAction(
     };
   }
 }
+

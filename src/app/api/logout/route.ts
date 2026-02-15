@@ -1,0 +1,28 @@
+// app/api/logout/route.ts
+'use server'
+import { NextResponse } from 'next/server'
+import { createClient } from '@/utils/supabase/server'
+import { deleteSession } from '@/lib/session'
+export async function POST() {
+  try {
+    const supabase = await createClient()
+
+    // 1. Cerrar sesión en Supabase
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      console.error('Error al cerrar sesión en Supabase:', error)
+    }
+
+    // 2. Eliminar sesión JWT
+    await deleteSession()
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error en el logout:', error)
+    return NextResponse.json(
+      { error: 'Ocurrió un error al cerrar sesión' },
+      { status: 500 }
+    )
+  }
+}
