@@ -44,6 +44,10 @@
             "button": "Update password",
             "success": "Password Updated!",
             "redirecting": "Redirecting to login..."
+        },
+        "layout": {
+            "title": "Smart Care for Everyone",
+            "subtitle": "Manage your health with the most advanced medical management platform."
         }
     }
 }

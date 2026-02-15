@@ -132,7 +132,7 @@ export function RegisterForm() {
                     <Input
                       placeholder={t("auth.register.fullName")}
                       disabled={isLoading}
-                      className="h-12 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                      className="h-12"
                       {...field}
                     />
                   </FormControl>
@@ -151,7 +151,7 @@ export function RegisterForm() {
                       type="email"
                       placeholder={t("auth.register.email")}
                       disabled={isLoading}
-                      className="h-12 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                      className="h-12"
                       {...field}
                     />
                   </FormControl>
@@ -171,7 +171,7 @@ export function RegisterForm() {
                         type={showPassword ? "text" : "password"}
                         placeholder={t("auth.register.password")}
                         disabled={isLoading}
-                        className="h-12 pr-10 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                        className="h-12 pr-10"
                         {...field}
                       />
                       <button
@@ -222,7 +222,7 @@ export function RegisterForm() {
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder={t("auth.register.confirmPassword")}
                         disabled={isLoading}
-                        className="h-12 pr-10 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                        className="h-12 pr-10"
                         {...field}
                       />
                       <button

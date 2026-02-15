@@ -81,7 +81,7 @@ export function AuthLayoutShell({ children }: AuthLayoutShellProps) {
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 mix-blend-multiply z-10" />
                     <Image
                         className="h-full w-full object-cover"
-                        src="https://images.unsplash.com/photo-1576091160550-2173599bd14e?q=80&w=2070&auto=format&fit=crop"
+                        src="/images/auth_background.webp"
                         alt="Medical background"
                         fill
                         priority
