@@ -53,8 +53,9 @@ export async function decryptSession(
       algorithms: ["HS256"],
     });
     return payload as unknown as SessionPayload;
-  } catch (error) {
-    console.error("Failed to decrypt session:", error);
+  } catch {
+    // Silenciar errores de desencriptación (cookie corrupta o firma inválida)
+    // Esto es un caso normal cuando SESSION_SECRET cambia o la cookie expira
     return null;
   }
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { createSession } from "@/lib/session";
 import { loginSchema, type LoginInput } from "@/features/auth/types/auth";
 
@@ -64,7 +64,7 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
       console.error("Profile fetch error:", profileError);
     }
 
-    const onboardingCompleted = profile?.onboarding_completed ?? false;
+    const onboardingCompleted = (profile as { onboarding_completed?: boolean } | null)?.onboarding_completed ?? false;
 
     // Crear sesión encriptada
     await createSession(

@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { createSession } from "@/lib/session";
 import { sendWelcomeEmail } from "@/lib/resend";
 import { registerSchema, type RegisterInput } from "@/features/auth/types/auth";
@@ -79,7 +79,7 @@ export async function registerAction(input: RegisterInput): Promise<RegisterResu
     await createSession(
       authData.user.id,
       authData.user.email!,
-      profile?.onboarding_completed ?? false
+      (profile as { onboarding_completed?: boolean } | null)?.onboarding_completed ?? false
     );
 
     // Enviar email de bienvenida

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { getSessionFromRequest } from '@/lib/session';
+import { jwtVerify } from 'jose';
 
 // ==========================================
 // Route Configuration
@@ -8,15 +8,46 @@ import { getSessionFromRequest } from '@/lib/session';
 const PUBLIC_ROUTES = ['/', '/login', '/register', '/forgot-password', '/reset-password'];
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
 const PROTECTED_ROUTES = ['/intranet', '/onboarding'];
+const SESSION_COOKIE_NAME = 'session';
+const SESSION_SECRET = process.env.SESSION_SECRET;
+
+interface SessionPayload {
+  user: {
+    id: string;
+    email: string;
+  };
+  onboardingCompleted: boolean;
+  expiresAt: number;
+}
+
+/**
+ * Desencripta la sesión desde cookies
+ */
+async function getSessionFromRequest(request: NextRequest): Promise<SessionPayload | null> {
+  const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  if (!sessionCookie || !SESSION_SECRET) return null;
+
+  try {
+    const { payload } = await jwtVerify(
+      sessionCookie, 
+      new TextEncoder().encode(SESSION_SECRET),
+      { algorithms: ['HS256'] }
+    );
+    return payload as unknown as SessionPayload;
+  } catch {
+    // Sesión inválida o expirada
+    return null;
+  }
+}
 
 // ==========================================
-// Middleware
+// Proxy (formerly Middleware in Next.js < 16)
 // ==========================================
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
+  
   const session = await getSessionFromRequest(request);
-
   const isAuthenticated = !!session;
   const onboardingCompleted = session?.onboardingCompleted ?? false;
 
@@ -39,7 +70,23 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   }
 
   // ==========================================
-  // 3. Not authenticated - redirect to login
+  // 3. Root path logic
+  // ==========================================
+  if (pathname === '/') {
+    if (isAuthenticated) {
+      // Usuario autenticado - redirigir según onboarding
+      if (onboardingCompleted) {
+        return NextResponse.redirect(new URL('/intranet', request.url));
+      } else {
+        return NextResponse.redirect(new URL('/onboarding', request.url));
+      }
+    }
+    // No autenticado - permitir acceso a landing (portal)
+    return NextResponse.next();
+  }
+
+  // ==========================================
+  // 4. Not authenticated - redirect to login
   // ==========================================
   if (!isAuthenticated) {
     // Allow public routes
@@ -54,7 +101,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   }
 
   // ==========================================
-  // 4. Authenticated but onboarding incomplete
+  // 5. Authenticated but onboarding incomplete
   // ==========================================
   if (isAuthenticated && !onboardingCompleted) {
     // Allow access to onboarding page
@@ -76,7 +123,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   }
 
   // ==========================================
-  // 5. Authenticated and onboarding complete
+  // 6. Authenticated and onboarding complete
   // ==========================================
   if (isAuthenticated && onboardingCompleted) {
     // Redirect auth routes to intranet

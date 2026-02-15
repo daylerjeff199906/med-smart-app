@@ -24,46 +24,47 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
 
-import { loginSchema, type LoginInput } from "@/features/auth/types/auth";
-import { loginAction } from "@/features/auth/actions/login";
+import { registerSchema, type RegisterInput } from "@/features/auth/types/auth";
+import { registerAction } from "@/features/auth/actions/register";
 
-interface LoginFormProps {
-  redirectTo?: string;
-}
-
-export function LoginForm({ redirectTo = "/onboarding" }: LoginFormProps) {
+export function RegisterForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
+      fullName: "",
       email: "",
       password: "",
-      rememberMe: false,
+      confirmPassword: "",
+      acceptTerms: false,
     },
   });
 
-  async function onSubmit(values: LoginInput) {
+  async function onSubmit(values: RegisterInput) {
     setIsLoading(true);
     setError(null);
+    setSuccess(false);
 
     try {
-      const result = await loginAction(values);
+      const result = await registerAction(values);
 
       if (!result.success) {
         setError(result.error || "An error occurred");
         return;
       }
 
-      // Redirección manejada por el middleware según el estado de onboarding
-      router.refresh();
-      router.push(redirectTo);
+      setSuccess(true);
+      // Redirect after a short delay
+      setTimeout(() => {
+        router.push("/onboarding");
+      }, 2000);
     } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
@@ -71,12 +72,28 @@ export function LoginForm({ redirectTo = "/onboarding" }: LoginFormProps) {
     }
   }
 
+  if (success) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="pt-6">
+          <div className="flex flex-col items-center space-y-4 text-center">
+            <CheckCircle className="h-12 w-12 text-green-500" />
+            <h3 className="text-xl font-semibold">Registration Successful!</h3>
+            <p className="text-muted-foreground">
+              Please check your email to verify your account. Redirecting...
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+        <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
         <CardDescription>
-          Enter your credentials to access your account
+          Enter your details to get started
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -87,6 +104,24 @@ export function LoginForm({ redirectTo = "/onboarding" }: LoginFormProps) {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="John Doe"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -116,7 +151,7 @@ export function LoginForm({ redirectTo = "/onboarding" }: LoginFormProps) {
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Enter your password"
+                      placeholder="Create a password"
                       disabled={isLoading}
                       {...field}
                     />
@@ -126,46 +161,37 @@ export function LoginForm({ redirectTo = "/onboarding" }: LoginFormProps) {
               )}
             />
 
-            <div className="flex items-center justify-between">
-              <FormField
-                control={form.control}
-                name="rememberMe"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormLabel className="text-sm font-normal cursor-pointer">
-                      Remember me
-                    </FormLabel>
-                  </FormItem>
-                )}
-              />
-
-              <Link
-                href="/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Confirm your password"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign in
+              Create Account
             </Button>
           </form>
         </Form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-primary hover:underline">
-            Sign up
+          Already have an account?{" "}
+          <Link href="/login" className="text-primary hover:underline">
+            Sign in
           </Link>
         </p>
       </CardFooter>
