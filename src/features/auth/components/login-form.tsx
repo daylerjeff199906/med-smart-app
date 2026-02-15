@@ -8,14 +8,6 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Form,
   FormControl,
   FormField,
@@ -24,7 +16,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 
@@ -107,7 +98,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
                       type="email"
                       placeholder={t("auth.login.email")}
                       disabled={isLoading}
-                      className="h-12 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                      className="h-12 w-full"
                       {...field}
                     />
                   </FormControl>
@@ -127,7 +118,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
                         type={showPassword ? "text" : "password"}
                         placeholder={t("auth.login.password")}
                         disabled={isLoading}
-                        className="h-12 pr-10 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                        className="h-12 pr-10 w-full0"
                         {...field}
                       />
                       <button
