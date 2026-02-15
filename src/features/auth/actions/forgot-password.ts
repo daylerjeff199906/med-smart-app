@@ -1,6 +1,4 @@
 "use server";
-
-import { createClient } from "@/utils/supabase/server";
 import { forgotPasswordSchema, type ForgotPasswordInput } from "@/features/auth/types/auth";
 import { ROUTES, getLocalizedRoute } from "@/lib/routes";
 

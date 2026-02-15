@@ -4,22 +4,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -118,7 +108,7 @@ export function ForgotPasswordForm() {
                     type="email"
                     placeholder={t("auth.forgotPassword.email")}
                     disabled={isLoading}
-                    className="h-12 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                    className="h-12"
                     {...field}
                   />
                 </FormControl>
