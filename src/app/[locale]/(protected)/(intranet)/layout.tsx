@@ -1,3 +1,5 @@
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/intranet/app-sidebar"
 import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 
@@ -16,8 +18,9 @@ export default async function ProtectedLayout({
   }
 
   return (
-    <>
+    <SidebarProvider>
+      <AppSidebar />
       {children}
-    </>
+    </SidebarProvider>
   )
 }
