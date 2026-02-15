@@ -30,6 +30,7 @@ export async function proxy(request: NextRequest) {
 
     // 2. Session Protection
     const session = await getSessionFromRequest(request);
+    console.log(session);
     const isAuthPage = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.FORGOT_PASSWORD, ROUTES.RESET_PASSWORD].some(route => currentPath.startsWith(route));
     const isProtectedPage = currentPath.startsWith(ROUTES.ONBOARDING) || currentPath.startsWith(ROUTES.DASHBOARD);
 
@@ -56,5 +57,11 @@ export const config = {
         // Skip all internal paths (_next)
         // Skip all static files
         "/((?!_next|api|.*\\..*).*)",
+        ROUTES.LOGIN,
+        ROUTES.REGISTER,
+        ROUTES.FORGOT_PASSWORD,
+        ROUTES.RESET_PASSWORD,
+        ROUTES.ONBOARDING,
+        ROUTES.DASHBOARD,
     ],
 };

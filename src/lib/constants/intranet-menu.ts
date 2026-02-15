@@ -37,28 +37,6 @@ export const mainNavigation: NavSection[] = [
         isActive: true,
       },
       {
-        title: "Pacientes",
-        url: "/intranet/pacientes",
-        icon: Users,
-        items: [
-          {
-            title: "Lista de Pacientes",
-            url: "/intranet/pacientes",
-            icon: ChevronRight,
-          },
-          {
-            title: "Nuevo Paciente",
-            url: "/intranet/pacientes/nuevo",
-            icon: ChevronRight,
-          },
-          {
-            title: "Historiales",
-            url: "/intranet/pacientes/historiales",
-            icon: ChevronRight,
-          },
-        ],
-      },
-      {
         title: "Citas",
         url: "/intranet/citas",
         icon: Calendar,
@@ -95,24 +73,10 @@ export const mainNavigation: NavSection[] = [
       },
       {
         title: "Configuración",
-        url: "/intranet/configuracion",
+        url: "/perfil",
         icon: Settings,
       },
     ],
-  },
-]
-
-// Configuración de proyectos/secciones
-export const projectsNavigation = [
-  {
-    name: "Cardiología",
-    url: "/intranet/especialidades/cardiologia",
-    icon: Heart,
-  },
-  {
-    name: "Pediatría",
-    url: "/intranet/especialidades/pediatria",
-    icon: Users,
   },
 ]
 

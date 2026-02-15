@@ -1,3 +1,4 @@
+'use client'
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
@@ -9,11 +10,18 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
+import { Input } from "@/components/ui/input"
+import { Search, Bell } from "lucide-react"
+import { getLocalizedRoute } from "@/lib/routes"
+import { useTranslation } from "@/hooks/use-translation"
+
 interface SiteHeaderProps {
   sectionTitle?: string
 }
 
 export function SiteHeader({ sectionTitle }: SiteHeaderProps) {
+  const { locale } = useTranslation()
+
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
       <div className="flex items-center gap-2 px-4">
@@ -25,7 +33,7 @@ export function SiteHeader({ sectionTitle }: SiteHeaderProps) {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="/intranet">
+              <BreadcrumbLink href={getLocalizedRoute("/intranet", locale)}>
                 Intranet
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -35,6 +43,24 @@ export function SiteHeader({ sectionTitle }: SiteHeaderProps) {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+      </div>
+
+      {/* Search Bar matching image 1 */}
+      <div className="flex-1 flex justify-center max-w-md mx-auto px-4">
+        <div className="relative w-full group">
+          <Input
+            placeholder="Buscar..."
+            className="h-10 w-full bg-slate-50 border-none rounded-2xl pl-4 pr-10 text-sm focus-visible:ring-1 focus-visible:ring-slate-200 transition-all"
+          />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 px-4">
+        <button className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
+          <Bell className="size-5" />
+          <span className="absolute top-1.5 right-1.5 size-2 bg-rose-500 rounded-full border-2 border-white" />
+        </button>
       </div>
     </header>
   )

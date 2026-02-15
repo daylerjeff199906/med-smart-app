@@ -13,16 +13,26 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { mainNavigation, projectsNavigation } from "@/lib/constants/intranet-menu"
+import { mainNavigation } from "@/lib/constants/intranet-menu"
 
-// Datos de ejemplo del usuario - en producción vendrían de la sesión
-const user = {
-  name: "Dr. García",
-  email: "dr.garcia@bequi.com",
-  avatar: "/avatars/dr-garcia.jpg",
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user?: {
+    name: string
+    email: string
+    avatar: string
+  }
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
+  // Datos por defecto si no se proporciona el usuario real
+  const defaultUser = {
+    name: "Usuario",
+    email: "",
+    avatar: "",
+  }
+
+  const activeUser = user || defaultUser
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -30,10 +40,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain sections={mainNavigation} />
-        <NavProjects projects={projectsNavigation} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser user={activeUser} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

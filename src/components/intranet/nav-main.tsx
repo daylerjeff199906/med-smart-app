@@ -1,6 +1,7 @@
 "use client"
 
 import { ChevronRight, type LucideIcon } from "lucide-react"
+import Link from "next/link"
 
 import {
   Collapsible,
@@ -17,6 +18,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { getLocalizedRoute } from "@/lib/routes"
+import { useTranslation } from "@/hooks/use-translation"
 
 export interface NavSection {
   title: string
@@ -34,6 +37,8 @@ export interface NavSection {
 }
 
 export function NavMain({ sections }: { sections: NavSection[] }) {
+  const { locale } = useTranslation()
+
   return (
     <>
       {sections.map((section) => (
@@ -63,10 +68,10 @@ export function NavMain({ sections }: { sections: NavSection[] }) {
                         {item.items?.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton asChild>
-                              <a href={subItem.url}>
-                                {subItem.icon && <subItem.icon className="size-3" />}
+                              <Link href={getLocalizedRoute(subItem.url, locale)}>
+                                {subItem.icon && <subItem.icon className="size-4" />}
                                 <span>{subItem.title}</span>
-                              </a>
+                              </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         ))}

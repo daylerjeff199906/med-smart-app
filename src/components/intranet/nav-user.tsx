@@ -31,6 +31,10 @@ import {
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
 
+import { getLocalizedRoute } from "@/lib/routes"
+import { useTranslation } from "@/hooks/use-translation"
+import Link from "next/link"
+
 interface NavUserProps {
   user: {
     name: string
@@ -41,6 +45,7 @@ interface NavUserProps {
 
 export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar()
+  const { t, locale } = useTranslation()
   const router = useRouter()
 
   const handleLogout = async () => {
@@ -48,9 +53,9 @@ export function NavUser({ user }: NavUserProps) {
       const response = await fetch('/api/logout', {
         method: 'POST',
       })
-      
+
       if (response.ok) {
-        router.push("/login")
+        router.push(getLocalizedRoute("/login", locale))
       } else {
         console.error('Error al cerrar sesión')
       }
@@ -71,7 +76,7 @@ export function NavUser({ user }: NavUserProps) {
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
-                  {user.name.split(" ").map(n => n[0]).join("")}
+                  {user.name.split(" ").map(n => n[0]).join("").toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -92,7 +97,7 @@ export function NavUser({ user }: NavUserProps) {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="rounded-lg">
-                    {user.name.split(" ").map(n => n[0]).join("")}
+                    {user.name.split(" ").map(n => n[0]).join("").toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -110,9 +115,11 @@ export function NavUser({ user }: NavUserProps) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Cuenta
+              <DropdownMenuItem asChild>
+                <Link href={getLocalizedRoute("/perfil", locale)}>
+                  <BadgeCheck />
+                  Cuenta
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />

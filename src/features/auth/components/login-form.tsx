@@ -49,7 +49,8 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     setError(null);
 
     try {
-      const result = await loginAction(values);
+      const result = await loginAction({ ...values, locale });
+      console.log(result);
 
       if (!result.success) {
         if (result.error === "email_not_confirmed") {
@@ -61,8 +62,16 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       }
 
       router.refresh();
-      // Use configured route or redirect target, localized
-      const target = redirectTo || ROUTES.ONBOARDING;
+
+      let target: string;
+      if (redirectTo) {
+        target = redirectTo;
+      } else if (result.onboardingCompleted) {
+        target = ROUTES.DASHBOARD;
+      } else {
+        target = ROUTES.ONBOARDING;
+      }
+
       router.push(getLocalizedRoute(target, locale));
     } catch {
       setError("An unexpected error occurred. Please try again.");

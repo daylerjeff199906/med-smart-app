@@ -25,6 +25,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
+import { getLocalizedRoute } from "@/lib/routes"
+import { useTranslation } from "@/hooks/use-translation"
+import Link from "next/link"
+
 interface Project {
   name: string
   url: string
@@ -38,6 +42,7 @@ interface NavProjectsProps {
 
 export function NavProjects({ projects, title = "Especialidades" }: NavProjectsProps) {
   const { isMobile } = useSidebar()
+  const { locale } = useTranslation()
 
   if (projects.length === 0) return null
 
@@ -48,10 +53,10 @@ export function NavProjects({ projects, title = "Especialidades" }: NavProjectsP
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <Link href={getLocalizedRoute(item.url, locale)}>
                 <item.icon />
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
