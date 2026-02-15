@@ -32,7 +32,7 @@ export async function registerAction(
       };
     }
 
-    const { email, password, fullName } = validation.data;
+    const { email, password, firstName, lastName } = validation.data;
     const supabase = await createClient();
 
     const redirectPath = getLocalizedRoute(ROUTES.LOGIN, locale);
@@ -42,7 +42,9 @@ export async function registerAction(
       password,
       options: {
         data: {
-          full_name: fullName,
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`, // Maintain for backward compatibility if needed
         },
         emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}${redirectPath}`,
       },
@@ -87,7 +89,7 @@ export async function registerAction(
     );
 
     // Enviar email de bienvenida
-    const emailResult = await sendWelcomeEmail(email, fullName);
+    const emailResult = await sendWelcomeEmail(email, `${firstName} ${lastName}`);
 
     if (!emailResult.success) {
       console.error("Failed to send welcome email:", emailResult.error);

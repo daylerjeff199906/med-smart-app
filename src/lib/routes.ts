@@ -17,7 +17,14 @@ export type RouteKey = keyof typeof ROUTES;
  * @returns The localized URL string
  */
 export function getLocalizedRoute(route: string, locale: string): string {
+    // If the route already starts with a locale, don't re-localize
+    if (route.startsWith(`/${locale}/`) || route === `/${locale}`) {
+        return route;
+    }
+
     // Ensure we don't double slash if route is "/"
-    const cleanRoute = route === "/" ? "" : route;
-    return `/${locale}${cleanRoute}`;
+    const cleanRoute = route.startsWith('/') ? route : `/${route}`;
+    const finalRoute = cleanRoute === "/" ? "" : cleanRoute;
+
+    return `/${locale}${finalRoute}`;
 }

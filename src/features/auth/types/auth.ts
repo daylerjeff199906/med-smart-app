@@ -23,11 +23,16 @@ export type LoginInput = z.infer<typeof loginSchema>;
 // ==========================================
 
 export const registerSchema = z.object({
-  fullName: z
+  firstName: z
     .string()
-    .min(1, "Full name is required")
-    .min(2, "Full name must be at least 2 characters")
-    .max(100, "Full name must be less than 100 characters"),
+    .min(1, "First name is too short")
+    .min(2, "First name must be at least 2 characters")
+    .max(100, "First name must be less than 100 characters"),
+  lastName: z
+    .string()
+    .min(1, "Last name is too short")
+    .min(2, "Last name must be at least 2 characters")
+    .max(100, "Last name must be less than 100 characters"),
   email: z
     .string()
     .min(1, "Email is required")

@@ -49,5 +49,39 @@
             "title": "Smart Care for Everyone",
             "subtitle": "Manage your health with the most advanced medical management platform."
         }
+    },
+    "onboarding": {
+        "title": "Configure your medical profile",
+        "subtitle": "To make BEQUI useful from day 1, we need some basic details.",
+        "identity": {
+            "title": "Identity",
+            "fullName": "Full Name",
+            "age": "Age",
+            "gender": {
+                "label": "Biological Gender",
+                "male": "Male",
+                "female": "Female",
+                "other": "Other"
+            }
+        },
+        "biometry": {
+            "title": "Basic Biometry",
+            "weight": "Weight (kg)",
+            "height": "Height (cm)"
+        },
+        "conditions": {
+            "title": "Critical Conditions",
+            "allergies": "Allergies (medication or food)",
+            "chronicConditions": "Chronic conditions",
+            "diabetes": "Diabetes",
+            "hypertension": "Hypertension"
+        },
+        "emergency": {
+            "title": "Emergency Contacts",
+            "name": "Contact Name",
+            "phone": "Phone",
+            "relationship": "Relationship"
+        },
+        "button": "Complete Profile"
     }
 }

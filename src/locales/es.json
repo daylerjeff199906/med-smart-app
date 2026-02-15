@@ -49,5 +49,39 @@
             "title": "Atención Inteligente para Todos",
             "subtitle": "Gestiona tu salud con la plataforma de gestión médica más avanzada."
         }
+    },
+    "onboarding": {
+        "title": "Configura tu perfil médico",
+        "subtitle": "Para que BEQUI sea útil desde el día 1, necesitamos algunos detalles básicos.",
+        "identity": {
+            "title": "Identidad",
+            "fullName": "Nombre completo",
+            "age": "Edad",
+            "gender": {
+                "label": "Género biológico",
+                "male": "Masculino",
+                "female": "Femenino",
+                "other": "Otro"
+            }
+        },
+        "biometry": {
+            "title": "Biometría básica",
+            "weight": "Peso (kg)",
+            "height": "Altura (cm)"
+        },
+        "conditions": {
+            "title": "Condiciones Críticas",
+            "allergies": "Alergias (medicamentosas o alimentarias)",
+            "chronicConditions": "Enfermedades crónicas",
+            "diabetes": "Diabetes",
+            "hypertension": "Hipertensión"
+        },
+        "emergency": {
+            "title": "Contactos de Emergencia",
+            "name": "Nombre del contacto",
+            "phone": "Teléfono",
+            "relationship": "Parentesco/Relación"
+        },
+        "button": "Completar perfil"
     }
 }
