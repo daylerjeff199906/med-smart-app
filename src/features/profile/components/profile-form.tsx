@@ -31,7 +31,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({ defaultValues, locale = "es" }: ProfileFormProps) {
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
-    
+
     const form = useForm<ProfileInput>({
         resolver: zodResolver(profileSchema),
         defaultValues,
@@ -39,10 +39,10 @@ export function ProfileForm({ defaultValues, locale = "es" }: ProfileFormProps) 
 
     async function onSubmit(data: ProfileInput) {
         setMessage(null)
-        
+
         try {
             const result = await updateProfileAction(data, locale)
-            
+
             if (result.success) {
                 setMessage({ type: "success", text: "Perfil actualizado correctamente" })
             } else {
@@ -62,7 +62,7 @@ export function ProfileForm({ defaultValues, locale = "es" }: ProfileFormProps) 
                     </AlertDescription>
                 </Alert>
             )}
-            
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pb-6 border-b">
                 <div>
                     <h1 className="text-xl font-bold tracking-tight text-slate-900">Configuración general</h1>
@@ -145,6 +145,36 @@ export function ProfileForm({ defaultValues, locale = "es" }: ProfileFormProps) 
                                     <FormItem>
                                         <FormControl>
                                             <Input {...field} disabled className="h-12 bg-slate-50 text-slate-500 rounded-md text-sm border-slate-200 cursor-not-allowed opacity-70" />
+                                        </FormControl>
+                                        <FormMessage className="text-xs mt-1" />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Birth Date - Read Only */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-8 border-b items-start">
+                        <div className="md:col-span-4">
+                            <FormLabel className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                F. de nacimiento
+                                <span className="bg-slate-100 truncate text-slate-500 font-normal py-0.5 px-1.5 rounded text-[10px] uppercase border border-slate-200">Solo lectura</span>
+                            </FormLabel>
+                            <p className="text-xs text-slate-500 mt-1 pr-4">Tu fecha de nacimiento registrada durante el onboarding.</p>
+                        </div>
+                        <div className="md:col-span-8">
+                            <FormField
+                                control={form.control}
+                                name="birthDate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="date"
+                                                disabled
+                                                className="h-12 bg-slate-50 text-slate-500 rounded-md text-sm border-slate-200 cursor-not-allowed opacity-70"
+                                            />
                                         </FormControl>
                                         <FormMessage className="text-xs mt-1" />
                                     </FormItem>

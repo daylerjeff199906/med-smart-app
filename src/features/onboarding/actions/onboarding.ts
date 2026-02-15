@@ -80,28 +80,42 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
             );
         }
 
-        // Step 4: Update health_data table (sensitive medical information)
+        // Step 4: Upsert health_data table (sensitive medical information)
+        // Using upsert to handle both insert and update cases
         const { error: healthError } = await supabase
             .from("health_data")
-            .update({
-                weight: data.weight,
-                height: data.height,
+            .upsert({
+                profile_id: userId,
+                weight: data.weight ?? null,
+                height: data.height ?? null,
                 blood_type: data.bloodType === "unknown" ? null : (data.bloodType ?? null),
                 allergies: data.allergies ?? null,
                 chronic_conditions: data.chronicConditions ?? null,
-                has_diabetes: data.hasDiabetes,
-                has_hypertension: data.hasHypertension,
-            })
-            .eq("profile_id", userId);
+                has_diabetes: data.hasDiabetes ?? false,
+                has_hypertension: data.hasHypertension ?? false,
+            }, {
+                onConflict: "profile_id"
+            });
 
         if (healthError) {
             throw new OnboardingError(
-                `Failed to update health data: ${healthError.message}`,
+                `Failed to save health data: ${healthError.message}`,
                 "HEALTH_DATA_ERROR"
             );
         }
 
-        // Step 5: Insert emergency contact
+        // Step 5: Upsert emergency contact (delete existing and insert new)
+        // First, delete any existing emergency contacts for this user
+        const { error: deleteError } = await supabase
+            .from("emergency_contacts")
+            .delete()
+            .eq("profile_id", userId);
+
+        if (deleteError) {
+            console.warn("Could not delete existing emergency contacts:", deleteError);
+        }
+
+        // Then insert the new emergency contact
         const { error: contactError } = await supabase
             .from("emergency_contacts")
             .insert({

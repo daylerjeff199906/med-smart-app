@@ -57,8 +57,8 @@ export function OnboardingForm({ profile }: onboardingPageProps) {
     defaultValues: {
       birthDate: "",
       gender: "male",
-      weight: undefined,
-      height: undefined,
+      weight: "",
+      height: "",
       bloodType: undefined,
       allergies: "",
       chronicConditions: "",
@@ -205,7 +205,14 @@ export function OnboardingForm({ profile }: onboardingPageProps) {
                       <FormItem>
                         <FormLabel className="text-xs font-bold text-muted-foreground/70 uppercase tracking-widest ml-1">{t("onboarding.biometry.weight")}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.1" placeholder="70" className="h-14 rounded-2xl border-muted-foreground/15 bg-muted/5 focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all px-5" {...field} />
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="70"
+                            className="h-14 rounded-2xl border-muted-foreground/15 bg-muted/5 focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all px-5"
+                            {...field}
+                            value={field.value || ""}
+                          />
                         </FormControl>
                         <FormMessage className="ml-1" />
                       </FormItem>
@@ -218,7 +225,14 @@ export function OnboardingForm({ profile }: onboardingPageProps) {
                       <FormItem>
                         <FormLabel className="text-xs font-bold text-muted-foreground/70 uppercase tracking-widest ml-1">{t("onboarding.biometry.height")}</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="175" className="h-14 rounded-2xl border-muted-foreground/15 bg-muted/5 focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all px-5" {...field} />
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="175"
+                            className="h-14 rounded-2xl border-muted-foreground/15 bg-muted/5 focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all px-5"
+                            {...field}
+                            value={field.value || ""}
+                          />
                         </FormControl>
                         <FormMessage className="ml-1" />
                       </FormItem>

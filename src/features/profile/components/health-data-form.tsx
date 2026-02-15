@@ -33,7 +33,7 @@ interface HealthDataFormProps {
 
 export function HealthDataForm({ defaultValues, locale = "es" }: HealthDataFormProps) {
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
-    
+
     const form = useForm<HealthDataInput>({
         resolver: zodResolver(healthDataSchema),
         defaultValues,
@@ -41,10 +41,10 @@ export function HealthDataForm({ defaultValues, locale = "es" }: HealthDataFormP
 
     async function onSubmit(data: HealthDataInput) {
         setMessage(null)
-        
+
         try {
             const result = await updateHealthDataAction(data, locale)
-            
+
             if (result.success) {
                 setMessage({ type: "success", text: "Datos médicos actualizados correctamente" })
             } else {
@@ -64,7 +64,7 @@ export function HealthDataForm({ defaultValues, locale = "es" }: HealthDataFormP
                     </AlertDescription>
                 </Alert>
             )}
-            
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pb-6 border-b">
                 <div>
                     <h1 className="text-xl font-bold tracking-tight text-slate-900">Datos Médicos</h1>
@@ -100,7 +100,17 @@ export function HealthDataForm({ defaultValues, locale = "es" }: HealthDataFormP
                                     <FormItem>
                                         <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Peso (kg)</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder="70" className="h-12 bg-white rounded-md text-sm border-slate-200" />
+                                            <Input
+                                                type="number"
+                                                step="0.1"
+                                                placeholder="70"
+                                                className="h-12 bg-white rounded-md text-sm border-slate-200"
+                                                value={field.value ?? ""}
+                                                onChange={(e) => {
+                                                    const value = e.target.value
+                                                    field.onChange(value === "" ? undefined : parseFloat(value))
+                                                }}
+                                            />
                                         </FormControl>
                                         <FormMessage className="text-xs" />
                                     </FormItem>
@@ -113,7 +123,17 @@ export function HealthDataForm({ defaultValues, locale = "es" }: HealthDataFormP
                                     <FormItem>
                                         <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Altura (cm)</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder="170" className="h-12 bg-white rounded-md text-sm border-slate-200" />
+                                            <Input
+                                                type="number"
+                                                step="1"
+                                                placeholder="170"
+                                                className="h-12 bg-white rounded-md text-sm border-slate-200"
+                                                value={field.value ?? ""}
+                                                onChange={(e) => {
+                                                    const value = e.target.value
+                                                    field.onChange(value === "" ? undefined : parseFloat(value))
+                                                }}
+                                            />
                                         </FormControl>
                                         <FormMessage className="text-xs" />
                                     </FormItem>
@@ -142,7 +162,9 @@ export function HealthDataForm({ defaultValues, locale = "es" }: HealthDataFormP
                                             </FormControl>
                                             <SelectContent className="rounded-xl border-slate-200 shadow-xl">
                                                 {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "unknown"].map(t => (
-                                                    <SelectItem key={t} value={t} className="rounded-lg py-3">{t}</SelectItem>
+                                                    <SelectItem key={t} value={t} className="rounded-lg py-3">
+                                                        {t === "unknown" ? "No sé" : t}
+                                                    </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>

@@ -17,8 +17,8 @@ export type ProfileInput = z.infer<typeof profileSchema>;
 
 // Health Data Schema
 export const healthDataSchema = z.object({
-    weight: z.string().optional(),
-    height: z.string().optional(),
+    weight: z.number().optional(),
+    height: z.number().optional(),
     bloodType: BloodTypeEnum.optional(),
     allergies: z.string().max(1000).optional(),
     chronicConditions: z.string().max(1000).optional(),

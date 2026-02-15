@@ -24,7 +24,7 @@ export async function updateProfileAction(
     }
 
     const supabase = await createClient()
-    
+
     const { error } = await supabase
       .from("profiles")
       .update({
@@ -65,46 +65,25 @@ export async function updateHealthDataAction(
 
     const supabase = await createClient()
 
-    // Verificar si ya existe registro de health_data
-    const { data: existingData } = await supabase
+    // Usar upsert para actualizar o crear el registro
+    const { error } = await supabase
       .from("health_data")
-      .select("id")
-      .eq("profile_id", session.user.id)
-      .single()
+      .upsert({
+        profile_id: session.user.id,
+        weight: data.weight ?? null,
+        height: data.height ?? null,
+        blood_type: data.bloodType === "unknown" ? null : (data.bloodType ?? null),
+        allergies: data.allergies ?? null,
+        chronic_conditions: data.chronicConditions ?? null,
+        has_diabetes: data.hasDiabetes ?? false,
+        has_hypertension: data.hasHypertension ?? false,
+      }, {
+        onConflict: "profile_id"
+      })
 
-    const healthDataPayload = {
-      profile_id: session.user.id,
-      weight: data.weight || null,
-      height: data.height || null,
-      blood_type: data.bloodType || null,
-      allergies: data.allergies || null,
-      chronic_conditions: data.chronicConditions || null,
-      has_diabetes: data.hasDiabetes,
-      has_hypertension: data.hasHypertension,
-      updated_at: new Date().toISOString(),
-    }
-
-    if (existingData) {
-      // Actualizar registro existente
-      const { error } = await supabase
-        .from("health_data")
-        .update(healthDataPayload)
-        .eq("id", existingData.id)
-
-      if (error) {
-        console.error("Error updating health data:", error)
-        return { success: false, error: "Error al actualizar datos médicos" }
-      }
-    } else {
-      // Crear nuevo registro
-      const { error } = await supabase
-        .from("health_data")
-        .insert(healthDataPayload)
-
-      if (error) {
-        console.error("Error inserting health data:", error)
-        return { success: false, error: "Error al crear datos médicos" }
-      }
+    if (error) {
+      console.error("Error upserting health data:", error)
+      return { success: false, error: "Error al actualizar datos médicos" }
     }
 
     revalidatePath(`/${locale}/perfil/salud`)
