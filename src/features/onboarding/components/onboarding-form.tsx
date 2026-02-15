@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Loader2, User, Activity, AlertTriangle, Phone, ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { Loader2, User, Activity, AlertTriangle, Phone, ChevronLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -119,7 +119,7 @@ export function OnboardingForm({ profile }: onboardingPageProps) {
   ];
 
   return (
-    <div className="flex flex-col min-h-[85vh] max-w-lg mx-auto items-center pt-4 md:pt-12 px-4">
+    <div className="flex flex-col min-h-[85vh] max-w-lg mx-auto items-center pt-4 px-4">
       {/* Logo Section */}
       <div className="mb-14 flex flex-col items-center gap-3 group">
         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white shadow-xl shadow-primary/20 transform transition-transform group-hover:scale-105 duration-300">
@@ -127,33 +127,6 @@ export function OnboardingForm({ profile }: onboardingPageProps) {
         </div>
         <span className="text-2xl font-black tracking-tighter text-foreground">BEQUI<span className="text-primary italic">.</span></span>
       </div>
-
-      {/* Modern Stepper (Eden Style) */}
-      <div className="relative flex items-center justify-between w-full max-w-xs mb-16">
-        <div className="absolute top-1/2 left-0 w-full h-[2px] bg-muted -translate-y-1/2 z-0" />
-
-        {/* Active Progress Line */}
-        <div
-          className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1)"
-          style={{ width: `${(currentStep / (STEPS.length - 1)) * 100}%` }}
-        />
-
-        {STEPS.map((_, index) => (
-          <div key={index} className="relative z-10">
-            <div
-              className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 font-bold text-sm",
-                index <= currentStep
-                  ? "bg-primary border-primary text-white shadow-lg shadow-primary/30"
-                  : "bg-white border-muted text-muted-foreground"
-              )}
-            >
-              {index + 1}
-            </div>
-          </div>
-        ))}
-      </div>
-
       {/* Typography Section */}
       <div className="text-center mb-12 w-full animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both">
         <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-4 leading-tight">
@@ -166,7 +139,7 @@ export function OnboardingForm({ profile }: onboardingPageProps) {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full flex-1 flex flex-col gap-10 max-w-sm mx-auto">
-          <div className="flex-1 min-h-[320px]">
+          <div className="flex-1">
             {error && (
               <div className="p-4 mb-8 rounded-2xl bg-destructive/5 text-destructive text-sm font-semibold border border-destructive/10 animate-in zoom-in-95 duration-300">
                 <div className="flex items-center gap-2">
@@ -268,8 +241,10 @@ export function OnboardingForm({ profile }: onboardingPageProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="rounded-2xl border-muted-foreground/10 p-2 shadow-2xl">
-                          {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((type) => (
-                            <SelectItem key={type} value={type} className="rounded-xl py-3 px-4 focus:bg-primary/5 text-center font-bold">{type}</SelectItem>
+                          {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "unknown"].map((type) => (
+                            <SelectItem key={type} value={type} className="rounded-xl py-3 px-4 focus:bg-primary/5 text-center font-bold">
+                              {type === "unknown" ? t("onboarding.biometry.bloodTypeUnknown") : type}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -408,43 +383,45 @@ export function OnboardingForm({ profile }: onboardingPageProps) {
           </div>
 
           {/* Action Area */}
-          <div className="flex flex-col gap-6 mt-4">
-            {currentStep < STEPS.length - 1 ? (
-              <Button
-                type="button"
-                onClick={nextStep}
-                className="w-full h-16 rounded-2xl text-lg font-bold shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300"
-              >
-                {t("onboarding.next")} {currentStep + 1}
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                className="w-full h-16 rounded-2xl text-lg font-bold shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 bg-gradient-to-r from-primary to-primary/90"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="h-6 w-6 animate-spin opacity-70" />
-                    {t("onboarding.saving")}
-                  </div>
-                ) : (
-                  t("onboarding.button")
-                )}
-              </Button>
-            )}
+          <div>
+            <div className="flex flex-col gap-6 mt-4">
+              {currentStep < STEPS.length - 1 ? (
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  className="w-full h-16 rounded-full text-lg font-bold shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300"
+                >
+                  {t("onboarding.next")} {currentStep + 1}
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  className="w-full h-16 rounded-full text-lg font-bold shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 bg-gradient-to-r from-primary to-primary/90"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="h-6 w-6 animate-spin opacity-70" />
+                      {t("onboarding.saving")}
+                    </div>
+                  ) : (
+                    t("onboarding.button")
+                  )}
+                </Button>
+              )}
 
-            {currentStep > 0 && (
-              <button
-                type="button"
-                onClick={prevStep}
-                className="text-muted-foreground/60 font-bold hover:text-foreground transition-all py-2 text-sm uppercase tracking-widest disabled:opacity-30 flex items-center justify-center gap-2 group"
-                disabled={isLoading}
-              >
-                <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                {t("onboarding.back")}
-              </button>
-            )}
+              {currentStep > 0 && (
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="text-muted-foreground/60 rounded-full font-bold hover:text-foreground transition-all py-2 text-sm uppercase tracking-widest disabled:opacity-30 flex items-center justify-center gap-2 group"
+                  disabled={isLoading}
+                >
+                  <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                  {t("onboarding.back")}
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </Form>

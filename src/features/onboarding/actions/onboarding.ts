@@ -86,7 +86,7 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
             .update({
                 weight: data.weight,
                 height: data.height,
-                blood_type: data.bloodType ?? null,
+                blood_type: data.bloodType === "unknown" ? null : (data.bloodType ?? null),
                 allergies: data.allergies ?? null,
                 chronic_conditions: data.chronicConditions ?? null,
                 has_diabetes: data.hasDiabetes,

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const BloodTypeEnum = z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]);
+export const BloodTypeEnum = z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "unknown"]);
 export type BloodType = z.infer<typeof BloodTypeEnum>;
 
 export const GenderEnum = z.enum(["male", "female", "other", "prefer_not_to_say"]);
@@ -12,8 +12,8 @@ export const onboardingSchema = z.object({
     gender: GenderEnum,
 
     // Biometric Data
-    weight: z.number().min(1, "Invalid weight").max(999.99, "Weight too high").optional(),
-    height: z.number().min(1, "Invalid height").max(999.99, "Height too high").optional(),
+    weight: z.string().optional(),
+    height: z.string().optional(),
 
     // Medical Information
     bloodType: BloodTypeEnum.optional(),

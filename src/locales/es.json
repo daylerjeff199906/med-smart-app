@@ -75,7 +75,8 @@
             "weight": "¿Cuál es tu peso actual? (kg)",
             "height": "¿Cuál es tu estatura? (cm)",
             "bloodType": "¿Cuál es tu tipo de sangre?",
-            "bloodTypePlaceholder": "Opcional"
+            "bloodTypePlaceholder": "Opcional",
+            "bloodTypeUnknown": "No recuerdo"
         },
         "conditions": {
             "title": "Tu Historial de Salud",
