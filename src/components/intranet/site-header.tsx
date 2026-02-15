@@ -12,6 +12,7 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Search, Bell } from "lucide-react"
+import Link from "next/link"
 import { getLocalizedRoute } from "@/lib/routes"
 import { useTranslation } from "@/hooks/use-translation"
 
@@ -33,8 +34,10 @@ export function SiteHeader({ sectionTitle }: SiteHeaderProps) {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href={getLocalizedRoute("/intranet", locale)}>
-                Intranet
+              <BreadcrumbLink asChild>
+                <Link href={getLocalizedRoute("/intranet", locale)}>
+                  Intranet
+                </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" />

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { profileSchema, type ProfileInput } from "../types/profile"
@@ -20,27 +21,49 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { useTranslation } from "@/hooks/use-translation"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { updateProfileAction } from "../actions/profile-actions"
 
-export function ProfileForm({ defaultValues }: { defaultValues: ProfileInput }) {
+interface ProfileFormProps {
+    defaultValues: ProfileInput
+    locale?: string
+}
+
+export function ProfileForm({ defaultValues, locale = "es" }: ProfileFormProps) {
+    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+    
     const form = useForm<ProfileInput>({
         resolver: zodResolver(profileSchema),
         defaultValues,
     })
 
     async function onSubmit(data: ProfileInput) {
+        setMessage(null)
+        
         try {
-            // Logic to update profile would go here
-            console.log("Saving profile:", data)
-            alert("Perfil actualizado")
-        } catch (error) {
-            alert("Error al actualizar el perfil")
+            const result = await updateProfileAction(data, locale)
+            
+            if (result.success) {
+                setMessage({ type: "success", text: "Perfil actualizado correctamente" })
+            } else {
+                setMessage({ type: "error", text: result.error || "Error al actualizar el perfil" })
+            }
+        } catch {
+            setMessage({ type: "error", text: "Error inesperado al actualizar el perfil" })
         }
     }
 
     return (
-        <div className="max-w-4xl mx-auto py-10">
-            <div className="flex items-center justify-between mb-10 pb-6 border-b">
+        <div className="max-w-4xl mx-auto py-6 lg:py-10">
+            {message && (
+                <Alert className={`mb-6 ${message.type === "success" ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
+                    <AlertDescription className={message.type === "success" ? "text-green-800" : "text-red-800"}>
+                        {message.text}
+                    </AlertDescription>
+                </Alert>
+            )}
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pb-6 border-b">
                 <div>
                     <h1 className="text-xl font-bold tracking-tight text-slate-900">Configuración general</h1>
                     <p className="text-sm text-slate-500 mt-1">Configura los ajustes generales de tu cuenta.</p>

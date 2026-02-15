@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { healthDataSchema, type HealthDataInput } from "../types/profile"
@@ -22,25 +23,49 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { updateHealthDataAction } from "../actions/profile-actions"
 
-export function HealthDataForm({ defaultValues }: { defaultValues: HealthDataInput }) {
+interface HealthDataFormProps {
+    defaultValues: HealthDataInput
+    locale?: string
+}
+
+export function HealthDataForm({ defaultValues, locale = "es" }: HealthDataFormProps) {
+    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+    
     const form = useForm<HealthDataInput>({
         resolver: zodResolver(healthDataSchema),
         defaultValues,
     })
 
     async function onSubmit(data: HealthDataInput) {
+        setMessage(null)
+        
         try {
-            console.log("Saving health data:", data)
-            alert("Datos de salud actualizados")
-        } catch (error) {
-            alert("Error al actualizar los datos de salud")
+            const result = await updateHealthDataAction(data, locale)
+            
+            if (result.success) {
+                setMessage({ type: "success", text: "Datos médicos actualizados correctamente" })
+            } else {
+                setMessage({ type: "error", text: result.error || "Error al actualizar datos médicos" })
+            }
+        } catch {
+            setMessage({ type: "error", text: "Error inesperado al actualizar datos médicos" })
         }
     }
 
     return (
-        <div className="max-w-4xl mx-auto py-10">
-            <div className="flex items-center justify-between mb-10 pb-6 border-b">
+        <div className="max-w-4xl mx-auto py-6 lg:py-10">
+            {message && (
+                <Alert className={`mb-6 ${message.type === "success" ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
+                    <AlertDescription className={message.type === "success" ? "text-green-800" : "text-red-800"}>
+                        {message.text}
+                    </AlertDescription>
+                </Alert>
+            )}
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pb-6 border-b">
                 <div>
                     <h1 className="text-xl font-bold tracking-tight text-slate-900">Datos Médicos</h1>
                     <p className="text-sm text-slate-500 mt-1">Gestiona tu información de salud y biometría.</p>

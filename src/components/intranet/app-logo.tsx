@@ -2,10 +2,15 @@
 
 import { Heart } from "lucide-react"
 import { appConfig } from "@/lib/constants/intranet-menu"
+import Link from "next/link"
+import { useTranslation } from "@/hooks/use-translation"
+import { getLocalizedRoute } from "@/lib/routes"
 
 export function AppLogo() {
+  const { locale } = useTranslation()
+
   return (
-    <div className="flex items-center gap-2 px-2">
+    <Link href={getLocalizedRoute(appConfig.url, locale)} className="flex items-center gap-2 px-2">
       <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
         <Heart className="size-4" />
       </div>
@@ -15,6 +20,6 @@ export function AppLogo() {
           {appConfig.description}
         </span>
       </div>
-    </div>
+    </Link>
   )
 }

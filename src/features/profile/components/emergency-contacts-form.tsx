@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { emergencyContactsListSchema, type EmergencyContactsListInput } from "../types/profile"
@@ -13,9 +14,18 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Plus, Trash2, ShieldAlert } from "lucide-react"
+import { updateEmergencyContactsAction } from "../actions/profile-actions"
 
-export function EmergencyContactsForm({ defaultValues }: { defaultValues: EmergencyContactsListInput }) {
+interface EmergencyContactsFormProps {
+    defaultValues: EmergencyContactsListInput
+    locale?: string
+}
+
+export function EmergencyContactsForm({ defaultValues, locale = "es" }: EmergencyContactsFormProps) {
+    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+    
     const form = useForm<EmergencyContactsListInput>({
         resolver: zodResolver(emergencyContactsListSchema),
         defaultValues,
@@ -27,17 +37,32 @@ export function EmergencyContactsForm({ defaultValues }: { defaultValues: Emerge
     })
 
     async function onSubmit(data: EmergencyContactsListInput) {
+        setMessage(null)
+        
         try {
-            console.log("Saving emergency contacts:", data)
-            alert("Contactos de emergencia actualizados")
-        } catch (error) {
-            alert("Error al actualizar los contactos")
+            const result = await updateEmergencyContactsAction(data.contacts, locale)
+            
+            if (result.success) {
+                setMessage({ type: "success", text: "Contactos de emergencia actualizados correctamente" })
+            } else {
+                setMessage({ type: "error", text: result.error || "Error al actualizar contactos" })
+            }
+        } catch {
+            setMessage({ type: "error", text: "Error inesperado al actualizar contactos" })
         }
     }
 
     return (
-        <div className="max-w-4xl mx-auto py-10">
-            <div className="flex items-center justify-between mb-10 pb-6 border-b">
+        <div className="max-w-4xl mx-auto py-6 lg:py-10">
+            {message && (
+                <Alert className={`mb-6 ${message.type === "success" ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
+                    <AlertDescription className={message.type === "success" ? "text-green-800" : "text-red-800"}>
+                        {message.text}
+                    </AlertDescription>
+                </Alert>
+            )}
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pb-6 border-b">
                 <div>
                     <h1 className="text-xl font-bold tracking-tight text-slate-900">Contactos de Emergencia</h1>
                     <p className="text-sm text-slate-500 mt-1">Personas a las que contactar en caso de una emergencia médica.</p>

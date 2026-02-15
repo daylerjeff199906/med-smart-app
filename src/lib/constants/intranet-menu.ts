@@ -9,6 +9,9 @@ import {
   Pill,
   Stethoscope,
   ChevronRight,
+  User,
+  HeartPulse,
+  ShieldAlert,
   type LucideIcon
 } from "lucide-react"
 
@@ -18,6 +21,7 @@ export interface MenuItem {
   icon?: LucideIcon
   isActive?: boolean
   items?: MenuItem[]
+  description?: string
 }
 
 export interface NavSection {
@@ -64,6 +68,29 @@ export const mainNavigation: NavSection[] = [
     ],
   },
   {
+    title: "Perfil",
+    items: [
+      {
+        title: "Mi Perfil",
+        url: "/perfil",
+        icon: User,
+        description: "Información personal",
+      },
+      {
+        title: "Datos Médicos",
+        url: "/perfil/salud",
+        icon: HeartPulse,
+        description: "Biometría e historial",
+      },
+      {
+        title: "Contactos",
+        url: "/perfil/contactos",
+        icon: ShieldAlert,
+        description: "Contactos de emergencia",
+      },
+    ],
+  },
+  {
     title: "Administración",
     items: [
       {
@@ -73,7 +100,7 @@ export const mainNavigation: NavSection[] = [
       },
       {
         title: "Configuración",
-        url: "/perfil",
+        url: "/intranet/configuracion",
         icon: Settings,
       },
     ],

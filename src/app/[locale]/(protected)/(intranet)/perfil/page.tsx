@@ -1,71 +1,57 @@
-import { LayoutWrapper } from "@/components/intranet/layout-wrapper"
 import { getSession } from "@/lib/session"
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { ROUTES, getLocalizedRoute } from "@/lib/routes"
-import { ProfileSettings } from "@/features/profile/components/profile-settings"
+import { ProfileForm } from "@/features/profile/components/profile-form"
+import type { ProfileInput } from "@/features/profile/types/profile"
 
 interface ProfilePageProps {
-    params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string }>
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
-    const { locale } = await params;
-    const session = await getSession();
+  const { locale } = await params
+  const session = await getSession()
 
-    if (!session) {
-        redirect(getLocalizedRoute(ROUTES.LOGIN, locale));
-    }
+  if (!session) {
+    redirect(getLocalizedRoute(ROUTES.LOGIN, locale))
+  }
 
-    const supabase = await createClient();
+  const supabase = await createClient()
 
-    // Fetch profile, health data and emergency contacts in parallel
-    const [
-        { data: profile },
-        { data: healthData },
-        { data: emergencyContacts }
-    ] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", session.user.id).single(),
-        supabase.from("health_data").select("*").eq("profile_id", session.user.id).single(),
-        supabase.from("emergency_contacts").select("*").eq("profile_id", session.user.id).order('priority_order', { ascending: true })
-    ]);
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("first_name, last_name, email, birth_date, gender, avatar_url")
+    .eq("id", session.user.id)
+    .single()
 
-    if (!profile) {
-        redirect(getLocalizedRoute(ROUTES.DASHBOARD, locale));
-    }
+  if (error || !profile) {
+    console.error("Error fetching profile:", error)
+    redirect(getLocalizedRoute(ROUTES.DASHBOARD, locale))
+  }
 
-    const initialData = {
-        profile: {
-            firstName: profile.first_name || "",
-            lastName: profile.last_name || "",
-            email: profile.email || "",
-            birthDate: profile.birth_date || "",
-            gender: profile.gender || undefined,
-            avatarUrl: profile.avatar_url || "",
-        },
-        health: {
-            weight: healthData?.weight || "",
-            height: healthData?.height || "",
-            bloodType: healthData?.blood_type || undefined,
-            allergies: healthData?.allergies || "",
-            chronicConditions: healthData?.chronic_conditions || "",
-            hasDiabetes: healthData?.has_diabetes || false,
-            hasHypertension: healthData?.has_hypertension || false,
-        },
-        emergency: {
-            contacts: (emergencyContacts || []).map((c: any) => ({
-                id: c.id,
-                contactName: c.contact_name,
-                phoneNumber: c.phone_number,
-                relationship: c.relationship,
-                priorityOrder: c.priority_order,
-            }))
-        }
-    };
+  const initialData: ProfileInput = {
+    firstName: profile.first_name || "",
+    lastName: profile.last_name || "",
+    email: profile.email || "",
+    birthDate: profile.birth_date || "",
+    gender: (profile.gender as ProfileInput["gender"]) || undefined,
+    avatarUrl: profile.avatar_url || "",
+  }
 
-    return (
-        <LayoutWrapper sectionTitle="Perfil">
-            <ProfileSettings initialData={initialData} />
-        </LayoutWrapper>
-    );
+  return (
+    <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-900">Mi Perfil</h1>
+        <p className="text-slate-500 mt-1">
+          Gestiona tu información personal y de cuenta
+        </p>
+      </div>
+      
+      <ProfileForm 
+        defaultValues={initialData} 
+        locale={locale}
+      />
+    </div>
+  )
 }
