@@ -44,6 +44,10 @@
             "button": "Actualizar contraseña",
             "success": "¡Contraseña actualizada!",
             "redirecting": "Redirigiendo al inicio de sesión..."
+        },
+        "layout": {
+            "title": "Atención Inteligente para Todos",
+            "subtitle": "Gestiona tu salud con la plataforma de gestión médica más avanzada."
         }
     }
 }

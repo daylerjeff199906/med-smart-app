@@ -118,7 +118,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
                         type={showPassword ? "text" : "password"}
                         placeholder={t("auth.login.password")}
                         disabled={isLoading}
-                        className="h-12 pr-10 w-full0"
+                        className="h-12 pr-10 w-full"
                         {...field}
                       />
                       <button

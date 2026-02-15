@@ -12,7 +12,7 @@ interface AuthLayoutShellProps {
 }
 
 export function AuthLayoutShell({ children }: AuthLayoutShellProps) {
-    const { locale } = useTranslation();
+    const { t, locale } = useTranslation();
     const pathname = usePathname();
     const router = useRouter();
 
@@ -78,7 +78,8 @@ export function AuthLayoutShell({ children }: AuthLayoutShellProps) {
             {/* Right Side: Image (Hidden on mobile) */}
             <div className="relative hidden w-0 flex-1 lg:block">
                 <div className="absolute inset-0 h-full w-full bg-slate-100 italic">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 mix-blend-multiply z-10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary/40 dark:from-primary/20 dark:to-primary/5 mix-blend-multiply z-10" />
+                    <div className="absolute inset-0 bg-black/30 z-10" />
                     <Image
                         className="h-full w-full object-cover"
                         src="/images/auth_background.webp"
@@ -87,9 +88,9 @@ export function AuthLayoutShell({ children }: AuthLayoutShellProps) {
                         priority
                     />
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-12 text-white z-20">
-                        <h2 className="text-4xl font-extrabold tracking-tight">Smart Care for Everyone</h2>
+                        <h2 className="text-4xl font-extrabold tracking-tight">{t("auth.layout.title")}</h2>
                         <p className="mt-4 text-xl text-white/90 max-w-md">
-                            Manage your health with the most advanced medical management platform.
+                            {t("auth.layout.subtitle")}
                         </p>
                     </div>
                 </div>
@@ -97,4 +98,5 @@ export function AuthLayoutShell({ children }: AuthLayoutShellProps) {
         </div>
     );
 }
+
 
