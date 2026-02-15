@@ -1,5 +1,4 @@
 "use server";
-
 import { createClient } from "@/utils/supabase/server";
 import { createSession } from "@/lib/session";
 import { sendWelcomeEmail } from "@/lib/resend";
@@ -35,10 +34,9 @@ export async function registerAction(
 
     const { email, password, fullName } = validation.data;
     const supabase = await createClient();
-    const adminClient = await (await import("@/utils/supabase/admin")).createAdminClient();
 
-    // 1. Crear usuario en Supabase Auth (sin enviar email de confirmación si se deshabilita en el dashboard)
-    // O mejor, generar el link manualmente si tenemos permisos de admin
+    const redirectPath = getLocalizedRoute(ROUTES.LOGIN, locale);
+    // Crear usuario en Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -46,6 +44,7 @@ export async function registerAction(
         data: {
           full_name: fullName,
         },
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}${redirectPath}`,
       },
     });
 
@@ -64,48 +63,41 @@ export async function registerAction(
       };
     }
 
-    // 2. Generar link de confirmación manualmente
-    const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
-      type: 'signup',
-      email: email,
-      password: password,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}${getLocalizedRoute(ROUTES.ONBOARDING, locale)}`,
-      }
-    });
+    // El perfil se crea automáticamente por el trigger
+    // Pero necesitamos esperar un momento para que el trigger se ejecute
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    if (linkError) {
-      console.error("Error generating signup link:", linkError);
-      // Continuamos aunque falle el link para intentar enviar el de bienvenida básico
-    }
-
-    const verificationLink = linkData?.properties?.action_link || `${process.env.NEXT_PUBLIC_APP_URL}${ROUTES.ONBOARDING}`;
-
-    // 3. Obtener el perfil creado (trigger)
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    const { data: profile } = await supabase
+    // Obtener el perfil creado
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("onboarding_completed")
       .eq("id", authData.user.id)
       .single();
 
-    // 4. Enviar email de bienvenida/verificación con Resend
-    const { sendWelcomeEmail: sendCustomEmail } = await import("@/services/email");
-    const emailResult = await sendCustomEmail({
-      email,
-      fullName,
-      onboardingLink: verificationLink,
-    });
+    if (profileError) {
+      console.error("Profile fetch error:", profileError);
+      // No fallamos el registro por esto, continuamos
+    }
+
+    // Crear sesión encriptada
+    await createSession(
+      authData.user.id,
+      authData.user.email!,
+      (profile as { onboarding_completed?: boolean } | null)?.onboarding_completed ?? false
+    );
+
+    // Enviar email de bienvenida
+    const emailResult = await sendWelcomeEmail(email, fullName);
 
     if (!emailResult.success) {
-      console.error("Failed to send verification email:", emailResult.error);
+      console.error("Failed to send welcome email:", emailResult.error);
+      // No fallamos el registro si el email falla, solo logueamos
     }
 
     return {
       success: true,
-      message: "Registration successful! Please check your email to verify your account (Sent via MedSmart).",
+      message: "Registration successful! Please check your email to verify your account.",
     };
-
   } catch (error) {
     console.error("Registration error:", error);
     return {
