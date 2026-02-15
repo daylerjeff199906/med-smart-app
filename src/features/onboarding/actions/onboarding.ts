@@ -64,9 +64,11 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
         const supabase = await createClient();
 
         // Step 3: Update profile table (identity information)
-        const { error: profileError } = await (supabase.from("profiles") as any)
+        const { error: profileError } = await supabase
+            .from("profiles")
             .update({
-                full_name: data.fullName,
+                first_name: data.firstName,
+                last_name: data.lastName,
                 birth_date: data.birthDate,
                 gender: data.gender,
                 onboarding_completed: true,
@@ -81,7 +83,8 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
         }
 
         // Step 4: Update health_data table (sensitive medical information)
-        const { error: healthError } = await (supabase.from("health_data") as any)
+        const { error: healthError } = await supabase
+            .from("health_data")
             .update({
                 weight: data.weight,
                 height: data.height,
@@ -101,7 +104,8 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
         }
 
         // Step 5: Insert emergency contact
-        const { error: contactError } = await (supabase.from("emergency_contacts") as any)
+        const { error: contactError } = await supabase
+            .from("emergency_contacts")
             .insert({
                 profile_id: userId,
                 contact_name: data.emergencyContactName,

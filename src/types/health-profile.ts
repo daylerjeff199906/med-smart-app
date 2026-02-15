@@ -1,43 +1,83 @@
-import type { Profile, HealthData, EmergencyContact } from "@/types/supabase";
+
+
+/**
+ * Bequi SuperApp - Type Definitions
+ * 
+ * Based on user's database structure
+ */
+
+// =============================================================================
+// ENUMS
+// =============================================================================
 
 export type Gender = "male" | "female" | "other" | "prefer_not_to_say";
 
 export type BloodType = "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 
+// =============================================================================
+// DOMAIN ENTITIES
+// =============================================================================
+
+/**
+ * User profile information
+ * Maps to: profiles table
+ */
 export interface UserProfile {
     readonly id: string;
-    readonly fullName: string | null;
+    readonly email: string;
+    readonly firstName: string | null;
+    readonly lastName: string | null;
     readonly avatarUrl: string | null;
-    readonly birthDate: string | null;  // ISO date: YYYY-MM-DD
+    readonly birthDate: string | null;
     readonly gender: Gender | null;
     readonly onboardingCompleted: boolean;
     readonly createdAt: string;
     readonly updatedAt: string;
 }
 
+/**
+ * Health data entity (sensitive PHI)
+ * Maps to: health_data table
+ */
 export interface UserHealthData {
     readonly profileId: string;
-    readonly weight: number | null;     // kg
-    readonly height: number | null;     // cm
+    readonly weight: number | null;
+    readonly height: number | null;
     readonly bloodType: BloodType | null;
     readonly allergies: string | null;
     readonly chronicConditions: string | null;
     readonly hasDiabetes: boolean;
     readonly hasHypertension: boolean;
-    readonly createdAt: string;
-    readonly updatedAt: string;
 }
 
+/**
+ * Emergency contact entity
+ * Maps to: emergency_contacts table
+ */
 export interface UserEmergencyContact {
     readonly id: string;
     readonly profileId: string;
     readonly contactName: string;
     readonly phoneNumber: string;
     readonly relationship: string;
-    readonly priorityOrder: number;     // 1 = primary, 2 = secondary, etc.
-    readonly createdAt: string;
-    readonly updatedAt: string;
+    readonly priorityOrder: number;
 }
+
+// =============================================================================
+// INPUT & UPDATE TYPES
+// =============================================================================
+
+export type CreateUserProfileInput = Omit<UserProfile, "id" | "createdAt" | "updatedAt">;
+export type CreateHealthDataInput = Omit<UserHealthData, "profileId">;
+export type CreateEmergencyContactInput = Omit<UserEmergencyContact, "id" | "profileId">;
+
+export type UpdateUserProfileInput = Partial<CreateUserProfileInput>;
+export type UpdateHealthDataInput = Partial<CreateHealthDataInput>;
+export type UpdateEmergencyContactInput = Partial<CreateEmergencyContactInput>;
+
+// =============================================================================
+// AGGREGATE TYPES
+// =============================================================================
 
 export interface UserHealthProfile {
     readonly profile: UserProfile;
@@ -47,38 +87,65 @@ export interface UserHealthProfile {
 
 export interface UserHealthProfileSummary {
     readonly id: string;
-    readonly fullName: string | null;
+    readonly firstName: string | null;
+    readonly lastName: string | null;
     readonly avatarUrl: string | null;
-    readonly age: number | null;        // Calculated from birthDate
+    readonly age: number | null;
     readonly gender: Gender | null;
     readonly hasDiabetes: boolean;
     readonly hasHypertension: boolean;
     readonly bloodType: BloodType | null;
 }
 
-export type CreateUserProfileInput = Omit<UserProfile, "id" | "createdAt" | "updatedAt">;
-export type CreateHealthDataInput = Omit<UserHealthData, "profileId" | "createdAt" | "updatedAt">;
-export type CreateEmergencyContactInput = Omit<UserEmergencyContact, "id" | "profileId" | "createdAt" | "updatedAt">;
+// =============================================================================
+// DATABASE ROW TYPES (RAW SUPABASE DATA)
+// =============================================================================
 
-export type UpdateUserProfileInput = Partial<CreateUserProfileInput>;
-export type UpdateHealthDataInput = Partial<CreateHealthDataInput>;
-export type UpdateEmergencyContactInput = Partial<CreateEmergencyContactInput>;
-
-export function isGender(value: unknown): value is Gender {
-    return typeof value === "string" &&
-        ["male", "female", "other", "prefer_not_to_say"].includes(value);
+export interface ProfileRow {
+    id: string;
+    email: string;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+    birth_date: string | null;
+    gender: Gender | null;
+    onboarding_completed: boolean;
+    created_at: string;
+    updated_at: string;
 }
 
-
-export function isBloodType(value: unknown): value is BloodType {
-    return typeof value === "string" &&
-        ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(value);
+export interface HealthDataRow {
+    profile_id: string;
+    weight: number | null;
+    height: number | null;
+    blood_type: BloodType | null;
+    allergies: string | null;
+    chronic_conditions: string | null;
+    has_diabetes: boolean;
+    has_hypertension: boolean;
 }
 
-export function mapToUserProfile(row: Profile): UserProfile {
+export interface EmergencyContactRow {
+    id: string;
+    profile_id: string;
+    contact_name: string;
+    phone_number: string;
+    relationship: string;
+    priority_order: number;
+    created_at: string;
+    updated_at: string;
+}
+
+// =============================================================================
+// MAPPERS
+// =============================================================================
+
+export function mapToUserProfile(row: ProfileRow): UserProfile {
     return {
         id: row.id,
-        fullName: row.full_name,
+        email: row.email,
+        firstName: row.first_name,
+        lastName: row.last_name,
         avatarUrl: row.avatar_url,
         birthDate: row.birth_date,
         gender: row.gender,
@@ -88,7 +155,7 @@ export function mapToUserProfile(row: Profile): UserProfile {
     };
 }
 
-export function mapToUserHealthData(row: HealthData): UserHealthData {
+export function mapToUserHealthData(row: HealthDataRow): UserHealthData {
     return {
         profileId: row.profile_id,
         weight: row.weight,
@@ -98,15 +165,10 @@ export function mapToUserHealthData(row: HealthData): UserHealthData {
         chronicConditions: row.chronic_conditions,
         hasDiabetes: row.has_diabetes,
         hasHypertension: row.has_hypertension,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
     };
 }
 
-/**
- * Maps database EmergencyContact row to UserEmergencyContact interface
- */
-export function mapToUserEmergencyContact(row: EmergencyContact): UserEmergencyContact {
+export function mapToUserEmergencyContact(row: EmergencyContactRow): UserEmergencyContact {
     return {
         id: row.id,
         profileId: row.profile_id,
@@ -114,15 +176,9 @@ export function mapToUserEmergencyContact(row: EmergencyContact): UserEmergencyC
         phoneNumber: row.phone_number,
         relationship: row.relationship,
         priorityOrder: row.priority_order,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
     };
 }
 
-/**
- * Calculates age from birth date
- * Returns null if birthDate is invalid
- */
 export function calculateAge(birthDate: string | null): number | null {
     if (!birthDate) return null;
 
@@ -141,16 +197,14 @@ export function calculateAge(birthDate: string | null): number | null {
     return age;
 }
 
-/**
- * Creates a summary view from full profile data
- */
 export function createProfileSummary(
     profile: UserProfile,
     healthData: UserHealthData
 ): UserHealthProfileSummary {
     return {
         id: profile.id,
-        fullName: profile.fullName,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
         avatarUrl: profile.avatarUrl,
         age: calculateAge(profile.birthDate),
         gender: profile.gender,

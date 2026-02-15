@@ -49,7 +49,8 @@ export function OnboardingForm() {
   const form = useForm<OnboardingInput>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
-      fullName: "",
+      firstName: "",
+      lastName: "",
       birthDate: "",
       gender: "male",
       weight: 0,
@@ -80,7 +81,7 @@ export function OnboardingForm() {
 
   function getFieldsForStep(stepIndex: number): string[] {
     switch (stepIndex) {
-      case 0: return ["fullName", "birthDate", "gender"];
+      case 0: return ["firstName", "lastName", "birthDate", "gender"];
       case 1: return ["weight", "height"];
       case 2: return ["allergies", "chronicConditions", "hasDiabetes", "hasHypertension"];
       case 3: return ["emergencyContactName", "emergencyContactPhone", "emergencyContactRelationship"];
@@ -154,19 +155,34 @@ export function OnboardingForm() {
           {/* STEP 0: IDENTITY */}
           {currentStep === 0 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("onboarding.identity.fullName")}</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("onboarding.identity.firstName")}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("onboarding.identity.lastName")}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -285,7 +301,7 @@ export function OnboardingForm() {
               <div className="flex flex-wrap gap-6 p-4 rounded-xl border bg-muted/30">
                 <FormField
                   control={form.control}
-                  name="diabetes"
+                  name="hasDiabetes"
                   render={({ field }) => (
                     <FormItem className="flex items-center gap-3 space-y-0">
                       <FormControl>
@@ -300,7 +316,7 @@ export function OnboardingForm() {
                 />
                 <FormField
                   control={form.control}
-                  name="hypertension"
+                  name="hasHypertension"
                   render={({ field }) => (
                     <FormItem className="flex items-center gap-3 space-y-0">
                       <FormControl>

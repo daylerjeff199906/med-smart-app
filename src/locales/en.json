@@ -56,7 +56,8 @@
         "subtitle": "To make BEQUI useful from day 1, we need some basic details.",
         "identity": {
             "title": "Identity",
-            "fullName": "Full Name",
+            "firstName": "First Name",
+            "lastName": "Last Name",
             "birthDate": "Birth Date",
             "gender": {
                 "label": "Biological Gender",

@@ -66,12 +66,13 @@ export async function registerAction(
     }
 
     // El perfil se crea automáticamente por el trigger con first_name y last_name
+    // Esperamos un momento para que el trigger se ejecute
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     // Obtener el perfil creado para confirmar estado de onboarding
-    const { data: profile, error: profileError } = await (supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("onboarding_completed, first_name, last_name") as any)
+      .select("onboarding_completed, first_name, last_name")
       .eq("id", authData.user.id)
       .single();
 
