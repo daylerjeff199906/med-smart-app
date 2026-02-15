@@ -30,24 +30,50 @@ export async function forgotPasswordAction(
     }
 
     const { email } = validation.data;
-    const supabase = await createClient();
+    const adminClient = await (await import("@/utils/supabase/admin")).createAdminClient();
 
-    const redirectPath = getLocalizedRoute(ROUTES.RESET_PASSWORD, locale);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}${redirectPath}`,
+    // 1. Generar link de recuperación manualmente
+    const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
+      type: 'recovery',
+      email: email,
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}${getLocalizedRoute(ROUTES.RESET_PASSWORD, locale)}`,
+      }
     });
 
-    if (error) {
-      console.error("Reset password error:", error);
+    if (linkError) {
+      console.error("Error generating reset link:", linkError);
       return {
         success: false,
-        error: error.message,
+        error: linkError.message,
+      };
+    }
+
+    if (!linkData?.properties?.action_link) {
+      return {
+        success: false,
+        error: "Failed to generate recovery link",
+      };
+    }
+
+    // 2. Enviar email de recuperación con Resend
+    const { sendPasswordResetEmail } = await import("@/services/email");
+    const emailResult = await sendPasswordResetEmail({
+      email,
+      resetLink: linkData.properties.action_link,
+    });
+
+    if (!emailResult.success) {
+      return {
+        success: false,
+        error: "Failed to send reset email. Please try again later.",
       };
     }
 
     return {
       success: true,
     };
+
   } catch (error) {
     console.error("Forgot password error:", error);
     return {
