@@ -1,0 +1,49 @@
+{
+    "auth": {
+        "login": {
+            "title": "Welcome back",
+            "subtitle": "Enter your credentials to access your account",
+            "email": "Email",
+            "password": "Password",
+            "button": "Sign in",
+            "noAccount": "Don't have an account?",
+            "register": "Sign up",
+            "forgotPassword": "Forgot password?"
+        },
+        "register": {
+            "title": "Create an account",
+            "subtitle": "Enter your details to get started",
+            "fullName": "Full Name",
+            "email": "Email",
+            "password": "Password",
+            "confirmPassword": "Confirm Password",
+            "button": "Create Account",
+            "haveAccount": "Already have an account?",
+            "login": "Sign in",
+            "acceptTerms": "I accept the terms and conditions",
+            "requirements": {
+                "length": "At least 8 characters",
+                "uppercase": "One uppercase letter",
+                "lowercase": "One lowercase letter",
+                "number": "One number",
+                "special": "One special character (@$!%*?&)"
+            }
+        },
+        "forgotPassword": {
+            "title": "Forgot Password",
+            "subtitle": "Enter your email for instructions",
+            "email": "Email",
+            "button": "Send instructions",
+            "backToLogin": "Back to login"
+        },
+        "resetPassword": {
+            "title": "New password",
+            "subtitle": "Create a new secure password for your account",
+            "password": "New password",
+            "confirmPassword": "Confirm password",
+            "button": "Update password",
+            "success": "Password Updated!",
+            "redirecting": "Redirecting to login..."
+        }
+    }
+}

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { forgotPasswordSchema, type ForgotPasswordInput } from "@/features/auth/types/auth";
+import { ROUTES, getLocalizedRoute } from "@/lib/routes";
 
 export interface ForgotPasswordResult {
   success: boolean;
@@ -12,7 +13,8 @@ export interface ForgotPasswordResult {
  * Server Action para solicitar recuperación de contraseña
  */
 export async function forgotPasswordAction(
-  input: ForgotPasswordInput
+  input: ForgotPasswordInput,
+  locale: string = "es"
 ): Promise<ForgotPasswordResult> {
   try {
     const validation = forgotPasswordSchema.safeParse(input);
@@ -30,8 +32,9 @@ export async function forgotPasswordAction(
     const { email } = validation.data;
     const supabase = await createClient();
 
+    const redirectPath = getLocalizedRoute(ROUTES.RESET_PASSWORD, locale);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}${redirectPath}`,
     });
 
     if (error) {
@@ -53,3 +56,4 @@ export async function forgotPasswordAction(
     };
   }
 }
+

@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { createSession } from "@/lib/session";
 import { sendWelcomeEmail } from "@/lib/resend";
 import { registerSchema, type RegisterInput } from "@/features/auth/types/auth";
+import { ROUTES, getLocalizedRoute } from "@/lib/routes";
 
 export interface RegisterResult {
   success: boolean;
@@ -14,11 +15,14 @@ export interface RegisterResult {
 /**
  * Server Action para registro de usuarios con envío de email de bienvenida
  */
-export async function registerAction(input: RegisterInput): Promise<RegisterResult> {
+export async function registerAction(
+  input: RegisterInput,
+  locale: string = "es"
+): Promise<RegisterResult> {
   try {
     // Validar input con Zod
     const validation = registerSchema.safeParse(input);
-    
+
     if (!validation.success) {
       const errorMessage = validation.error.issues
         .map((issue) => issue.message)
@@ -32,6 +36,7 @@ export async function registerAction(input: RegisterInput): Promise<RegisterResu
     const { email, password, fullName } = validation.data;
     const supabase = await createClient();
 
+    const redirectPath = getLocalizedRoute(ROUTES.LOGIN, locale);
     // Crear usuario en Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
@@ -40,7 +45,7 @@ export async function registerAction(input: RegisterInput): Promise<RegisterResu
         data: {
           full_name: fullName,
         },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}${redirectPath}`,
       },
     });
 
@@ -84,7 +89,7 @@ export async function registerAction(input: RegisterInput): Promise<RegisterResu
 
     // Enviar email de bienvenida
     const emailResult = await sendWelcomeEmail(email, fullName);
-    
+
     if (!emailResult.success) {
       console.error("Failed to send welcome email:", emailResult.error);
       // No fallamos el registro si el email falla, solo logueamos

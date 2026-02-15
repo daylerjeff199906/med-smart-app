@@ -26,19 +26,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 import { loginSchema, type LoginInput } from "@/features/auth/types/auth";
 import { loginAction } from "@/features/auth/actions/login";
+
+import { useTranslation } from "@/hooks/use-translation";
+import { ROUTES, getLocalizedRoute } from "@/lib/routes";
 
 interface LoginFormProps {
   redirectTo?: string;
 }
 
-export function LoginForm({ redirectTo = "/onboarding" }: LoginFormProps) {
+export function LoginForm({ redirectTo }: LoginFormProps) {
   const router = useRouter();
+  const { t, locale } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -61,9 +66,10 @@ export function LoginForm({ redirectTo = "/onboarding" }: LoginFormProps) {
         return;
       }
 
-      // Redirección manejada por el middleware según el estado de onboarding
       router.refresh();
-      router.push(redirectTo);
+      // Use configured route or redirect target, localized
+      const target = redirectTo || ROUTES.ONBOARDING;
+      router.push(getLocalizedRoute(target, locale));
     } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
@@ -72,33 +78,36 @@ export function LoginForm({ redirectTo = "/onboarding" }: LoginFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-        <CardDescription>
-          Enter your credentials to access your account
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+    <div className="w-full">
+      <div className="mb-8 space-y-2 text-center lg:text-left">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          {t("auth.login.title")}
+        </h1>
+        <p className="text-muted-foreground">
+          {t("auth.login.subtitle")}
+        </p>
+      </div>
 
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {error && (
+            <Alert variant="destructive" className="animate-in fade-in duration-300">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="space-y-4">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="name@company.com"
+                      placeholder={t("auth.login.email")}
                       disabled={isLoading}
+                      className="h-12 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
                       {...field}
                     />
                   </FormControl>
@@ -112,63 +121,61 @@ export function LoginForm({ redirectTo = "/onboarding" }: LoginFormProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password"
-                      disabled={isLoading}
-                      {...field}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder={t("auth.login.password")}
+                        disabled={isLoading}
+                        className="h-12 pr-10 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                        {...field}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
 
-            <div className="flex items-center justify-between">
-              <FormField
-                control={form.control}
-                name="rememberMe"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormLabel className="text-sm font-normal cursor-pointer">
-                      Remember me
-                    </FormLabel>
-                  </FormItem>
-                )}
-              />
+          <Button type="submit" className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 transition-all active:scale-[0.98]" disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              t("auth.login.button")
+            )}
+          </Button>
+        </form>
+      </Form>
 
-              <Link
-                href="/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign in
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-      <CardFooter className="flex justify-center">
+      <div className="mt-10 space-y-4 text-center">
         <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-primary hover:underline">
-            Sign up
+          {t("auth.login.noAccount")}{" "}
+          <Link href={getLocalizedRoute(ROUTES.REGISTER, locale)} className="font-semibold text-primary hover:underline">
+            {t("auth.login.register")}
           </Link>
         </p>
-      </CardFooter>
-    </Card>
+        <Link
+          href={getLocalizedRoute(ROUTES.FORGOT_PASSWORD, locale)}
+          className="block text-sm font-medium text-muted-foreground hover:text-primary transition-colors hover:underline"
+        >
+          {t("auth.login.forgotPassword")}
+        </Link>
+      </div>
+    </div>
   );
 }
+
+

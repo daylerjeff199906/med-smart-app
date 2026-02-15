@@ -1,0 +1,49 @@
+{
+    "auth": {
+        "login": {
+            "title": "Ingresa a tu cuenta",
+            "subtitle": "Ingresa tu email para acceder a tu cuenta",
+            "email": "Email",
+            "password": "Contraseña",
+            "button": "Ingresar",
+            "noAccount": "¿No tienes una cuenta?",
+            "register": "Regístrate",
+            "forgotPassword": "Olvidé mi contraseña"
+        },
+        "register": {
+            "title": "Crea tu cuenta",
+            "subtitle": "Regístrate para comenzar",
+            "fullName": "Nombre completo",
+            "email": "Email",
+            "password": "Contraseña",
+            "confirmPassword": "Confirmar contraseña",
+            "button": "Registrarse",
+            "haveAccount": "¿Ya tienes una cuenta?",
+            "login": "Inicia sesión",
+            "acceptTerms": "Acepto los términos y condiciones",
+            "requirements": {
+                "length": "Al menos 8 caracteres",
+                "uppercase": "Una letra mayúscula",
+                "lowercase": "Una letra minúscula",
+                "number": "Un número",
+                "special": "Un carácter especial (@$!%*?&)"
+            }
+        },
+        "forgotPassword": {
+            "title": "Recuperar contraseña",
+            "subtitle": "Ingresa tu email para enviarte las instrucciones",
+            "email": "Email",
+            "button": "Enviar instrucciones",
+            "backToLogin": "Volver al inicio de sesión"
+        },
+        "resetPassword": {
+            "title": "Nueva contraseña",
+            "subtitle": "Crea una nueva contraseña segura para tu cuenta",
+            "password": "Nueva contraseña",
+            "confirmPassword": "Confirmar contraseña",
+            "button": "Actualizar contraseña",
+            "success": "¡Contraseña actualizada!",
+            "redirecting": "Redirigiendo al inicio de sesión..."
+        }
+    }
+}

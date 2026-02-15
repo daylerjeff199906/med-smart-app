@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
-import { completeOnboarding } from "@/app/(protected)/onboarding/page";
+import { completeOnboarding } from "@/features/onboarding/actions/onboarding";
 
 export function OnboardingForm() {
   const router = useRouter();

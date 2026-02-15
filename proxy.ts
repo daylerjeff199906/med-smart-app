@@ -2,14 +2,16 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
 // ==========================================
-// Route Configuration
+// Configuration
 // ==========================================
 
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/forgot-password', '/reset-password'];
+const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
 const PROTECTED_ROUTES = ['/intranet', '/onboarding'];
 const SESSION_COOKIE_NAME = 'session';
 const SESSION_SECRET = process.env.SESSION_SECRET;
+const DEFAULT_LOCALE = 'es';
+const SUPPORTED_LOCALES = ['en', 'es'];
 
 interface SessionPayload {
   user: {
@@ -35,9 +37,21 @@ async function getSessionFromRequest(request: NextRequest): Promise<SessionPaylo
     );
     return payload as unknown as SessionPayload;
   } catch {
-    // Sesión inválida o expirada
     return null;
   }
+}
+
+/**
+ * Obtiene el locale de la URL o usa el default
+ */
+function getLocaleFromPathname(pathname: string): string | null {
+  const segments = pathname.split('/');
+  const firstSegment = segments[1];
+  
+  if (SUPPORTED_LOCALES.includes(firstSegment)) {
+    return firstSegment;
+  }
+  return null;
 }
 
 // ==========================================
@@ -46,6 +60,12 @@ async function getSessionFromRequest(request: NextRequest): Promise<SessionPaylo
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
+  
+  // Obtener locale de la URL
+  const locale = getLocaleFromPathname(pathname);
+  const pathnameWithoutLocale = locale 
+    ? pathname.replace(`/${locale}`, '') || '/'
+    : pathname;
   
   const session = await getSessionFromRequest(request);
   const isAuthenticated = !!session;
@@ -70,15 +90,28 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   }
 
   // ==========================================
-  // 3. Root path logic
+  // 3. Redirect root to default locale
   // ==========================================
   if (pathname === '/') {
+    return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url));
+  }
+
+  // ==========================================
+  // 4. If no locale in URL, add default locale
+  // ==========================================
+  if (!locale) {
+    return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}${pathname}`, request.url));
+  }
+
+  // ==========================================
+  // 5. Root path with locale logic
+  // ==========================================
+  if (pathnameWithoutLocale === '/') {
     if (isAuthenticated) {
-      // Usuario autenticado - redirigir según onboarding
       if (onboardingCompleted) {
-        return NextResponse.redirect(new URL('/intranet', request.url));
+        return NextResponse.redirect(new URL(`/${locale}/intranet`, request.url));
       } else {
-        return NextResponse.redirect(new URL('/onboarding', request.url));
+        return NextResponse.redirect(new URL(`/${locale}/onboarding`, request.url));
       }
     }
     // No autenticado - permitir acceso a landing (portal)
@@ -86,54 +119,54 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   }
 
   // ==========================================
-  // 4. Not authenticated - redirect to login
+  // 6. Not authenticated - redirect to login
   // ==========================================
   if (!isAuthenticated) {
     // Allow public routes
-    if (PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+    if (PUBLIC_ROUTES.some(route => pathnameWithoutLocale === route || pathnameWithoutLocale.startsWith(route + '/'))) {
       return NextResponse.next();
     }
 
     // Redirect to login for protected routes
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
+    const loginUrl = new URL(`/${locale}/login`, request.url);
+    loginUrl.searchParams.set('redirect', pathnameWithoutLocale);
     return NextResponse.redirect(loginUrl);
   }
 
   // ==========================================
-  // 5. Authenticated but onboarding incomplete
+  // 7. Authenticated but onboarding incomplete
   // ==========================================
   if (isAuthenticated && !onboardingCompleted) {
     // Allow access to onboarding page
-    if (pathname === '/onboarding' || pathname.startsWith('/onboarding/')) {
+    if (pathnameWithoutLocale === '/onboarding' || pathnameWithoutLocale.startsWith('/onboarding/')) {
       return NextResponse.next();
     }
 
     // Redirect auth routes to onboarding
-    if (AUTH_ROUTES.includes(pathname)) {
-      return NextResponse.redirect(new URL('/onboarding', request.url));
+    if (AUTH_ROUTES.includes(pathnameWithoutLocale)) {
+      return NextResponse.redirect(new URL(`/${locale}/onboarding`, request.url));
     }
 
     // Redirect other protected routes to onboarding
-    if (PROTECTED_ROUTES.some(route => pathname.startsWith(route)) && pathname !== '/onboarding') {
-      return NextResponse.redirect(new URL('/onboarding', request.url));
+    if (PROTECTED_ROUTES.some(route => pathnameWithoutLocale.startsWith(route)) && pathnameWithoutLocale !== '/onboarding') {
+      return NextResponse.redirect(new URL(`/${locale}/onboarding`, request.url));
     }
 
     return NextResponse.next();
   }
 
   // ==========================================
-  // 6. Authenticated and onboarding complete
+  // 8. Authenticated and onboarding complete
   // ==========================================
   if (isAuthenticated && onboardingCompleted) {
     // Redirect auth routes to intranet
-    if (AUTH_ROUTES.includes(pathname)) {
-      return NextResponse.redirect(new URL('/intranet', request.url));
+    if (AUTH_ROUTES.includes(pathnameWithoutLocale)) {
+      return NextResponse.redirect(new URL(`/${locale}/intranet`, request.url));
     }
 
     // Redirect onboarding to intranet
-    if (pathname === '/onboarding' || pathname.startsWith('/onboarding/')) {
-      return NextResponse.redirect(new URL('/intranet', request.url));
+    if (pathnameWithoutLocale === '/onboarding' || pathnameWithoutLocale.startsWith('/onboarding/')) {
+      return NextResponse.redirect(new URL(`/${locale}/intranet`, request.url));
     }
 
     return NextResponse.next();
