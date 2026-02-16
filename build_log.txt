@@ -1,0 +1,12 @@
+
+> bequi-app@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 38.4s
+  Running TypeScript ...
+  Collecting page data using 7 workers ...
+Ô¿» Invalid segment configuration export detected. This can cause unexpected behavior from the configs not being applied. You should see the relevant failures in the logs above. Please fix them to continue.

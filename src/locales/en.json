@@ -1,0 +1,106 @@
+{
+    "auth": {
+        "login": {
+            "title": "Welcome back",
+            "subtitle": "Enter your credentials to access your account",
+            "email": "Email",
+            "password": "Password",
+            "button": "Sign in",
+            "noAccount": "Don't have an account?",
+            "register": "Sign up",
+            "forgotPassword": "Forgot password?",
+            "emailNotConfirmed": "Please confirm your email address before signing in."
+        },
+        "register": {
+            "title": "Create an account",
+            "subtitle": "Enter your details to get started",
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "email": "Email",
+            "password": "Password",
+            "confirmPassword": "Confirm Password",
+            "button": "Create Account",
+            "haveAccount": "Already have an account?",
+            "login": "Sign in",
+            "acceptTerms": "I accept the terms and conditions",
+            "requirements": {
+                "length": "At least 8 characters",
+                "uppercase": "One uppercase letter",
+                "lowercase": "One lowercase letter",
+                "number": "One number",
+                "special": "One special character (@$!%*?&)"
+            }
+        },
+        "forgotPassword": {
+            "title": "Forgot Password",
+            "subtitle": "Enter your email for instructions",
+            "email": "Email",
+            "button": "Send instructions",
+            "backToLogin": "Back to login"
+        },
+        "resetPassword": {
+            "title": "New password",
+            "subtitle": "Create a new secure password for your account",
+            "password": "New password",
+            "confirmPassword": "Confirm password",
+            "button": "Update password",
+            "success": "Password Updated!",
+            "redirecting": "Redirecting to login..."
+        },
+        "layout": {
+            "title": "Smart Care for Everyone",
+            "subtitle": "Manage your health with the most advanced medical management platform."
+        }
+    },
+    "onboarding": {
+        "title": "Configure your medical profile",
+        "subtitle": "To make BEQUI useful from day 1, we need some basic details.",
+        "identity": {
+            "title": "Identity",
+            "subtitle": "Let's start with your basic information to personalize your experience.",
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "birthDate": "What is your birth date?",
+            "gender": {
+                "label": "What is your gender?",
+                "placeholder": "Select",
+                "male": "Male",
+                "female": "Female",
+                "other": "Other",
+                "prefer_not_to_say": "Prefer not to say"
+            }
+        },
+        "biometry": {
+            "title": "How is your biometry?",
+            "subtitle": "This data allows us to monitor your health effectively.",
+            "weight": "What is your current weight? (kg)",
+            "height": "What is your height? (cm)",
+            "bloodType": "What is your blood type?",
+            "bloodTypePlaceholder": "Optional"
+        },
+        "conditions": {
+            "title": "Your Health History",
+            "subtitle": "Select if you have any of these common conditions.",
+            "allergies": "Do you have any allergies we should know about?",
+            "allergiesPlaceholder": "Penicillin, peanuts, dust...",
+            "chronicConditions": "Do you have any chronic conditions?",
+            "diabetes": "Diabetes",
+            "diabetesDetail": "Blood glucose",
+            "hypertension": "Pressure",
+            "hypertensionDetail": "Hypertension"
+        },
+        "emergency": {
+            "title": "Emergency Contact",
+            "subtitle": "Your safety comes first. Who do we contact in an emergency?",
+            "name": "Who should we contact in case of emergency?",
+            "namePlaceholder": "Enter full name",
+            "phone": "What is their phone number?",
+            "relationship": "What is their relationship to you?",
+            "relationshipPlaceholder": "Mother, Husband..."
+        },
+        "button": "Complete Profile",
+        "next": "Continue Step",
+        "back": "Back",
+        "saving": "Saving..."
+    }
+}

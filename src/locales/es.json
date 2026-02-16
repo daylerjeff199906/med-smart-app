@@ -1,0 +1,107 @@
+{
+    "auth": {
+        "login": {
+            "title": "Ingresa a tu cuenta",
+            "subtitle": "Ingresa tu email para acceder a tu cuenta",
+            "email": "Email",
+            "password": "Contraseña",
+            "button": "Ingresar",
+            "noAccount": "¿No tienes una cuenta?",
+            "register": "Regístrate",
+            "forgotPassword": "Olvidé mi contraseña",
+            "emailNotConfirmed": "Por favor, confirma tu correo electrónico antes de iniciar sesión."
+        },
+        "register": {
+            "title": "Crea tu cuenta",
+            "subtitle": "Regístrate para comenzar",
+            "firstName": "Nombres",
+            "lastName": "Apellidos",
+            "email": "Email",
+            "password": "Contraseña",
+            "confirmPassword": "Confirmar contraseña",
+            "button": "Registrarse",
+            "haveAccount": "¿Ya tienes una cuenta?",
+            "login": "Inicia sesión",
+            "acceptTerms": "Acepto los términos y condiciones",
+            "requirements": {
+                "length": "Al menos 8 caracteres",
+                "uppercase": "Una letra mayúscula",
+                "lowercase": "Una letra minúscula",
+                "number": "Un número",
+                "special": "Un carácter especial (@$!%*?&)"
+            }
+        },
+        "forgotPassword": {
+            "title": "Recuperar contraseña",
+            "subtitle": "Ingresa tu email para enviarte las instrucciones",
+            "email": "Email",
+            "button": "Enviar instrucciones",
+            "backToLogin": "Volver al inicio de sesión"
+        },
+        "resetPassword": {
+            "title": "Nueva contraseña",
+            "subtitle": "Crea una nueva contraseña segura para tu cuenta",
+            "password": "Nueva contraseña",
+            "confirmPassword": "Confirmar contraseña",
+            "button": "Actualizar contraseña",
+            "success": "¡Contraseña actualizada!",
+            "redirecting": "Redirigiendo al inicio de sesión..."
+        },
+        "layout": {
+            "title": "Atención Inteligente para Todos",
+            "subtitle": "Gestiona tu salud con la plataforma de gestión médica más avanzada."
+        }
+    },
+    "onboarding": {
+        "title": "Configura tu perfil médico",
+        "subtitle": "Para que BEQUI sea útil desde el día 1, necesitamos algunos detalles básicos.",
+        "identity": {
+            "title": "Identidad",
+            "subtitle": "Comencemos con tu información básica para personalizar tu experiencia.",
+            "firstName": "Nombres",
+            "lastName": "Apellidos",
+            "birthDate": "¿Cuál es tu fecha de nacimiento?",
+            "gender": {
+                "label": "¿Cuál es tu género?",
+                "placeholder": "Selecciona",
+                "male": "Masculino",
+                "female": "Femenino",
+                "other": "Otro",
+                "prefer_not_to_say": "Prefiero no decir"
+            }
+        },
+        "biometry": {
+            "title": "¿Cómo está tu biometría?",
+            "subtitle": "Estos datos nos permiten monitorear tu salud de manera efectiva.",
+            "weight": "¿Cuál es tu peso actual? (kg)",
+            "height": "¿Cuál es tu estatura? (cm)",
+            "bloodType": "¿Cuál es tu tipo de sangre?",
+            "bloodTypePlaceholder": "Opcional",
+            "bloodTypeUnknown": "No recuerdo"
+        },
+        "conditions": {
+            "title": "Tu Historial de Salud",
+            "subtitle": "Selecciona si tienes alguna de estas condiciones comunes.",
+            "allergies": "¿Tienes alguna alergia que debamos conocer?",
+            "allergiesPlaceholder": "Penicilina, maní, polvo...",
+            "chronicConditions": "¿Tienes alguna condición crónica?",
+            "diabetes": "Diabetes",
+            "diabetesDetail": "Glucosa en sangre",
+            "hypertension": "Presión",
+            "hypertensionDetail": "Hipertensión"
+        },
+        "emergency": {
+            "title": "Contacto de Emergencia",
+            "subtitle": "Tu seguridad es lo primero. ¿A quién contactamos en una urgencia?",
+            "name": "¿A quién contactamos en caso de emergencia?",
+            "namePlaceholder": "Escribe el nombre completo",
+            "phone": "¿Cuál es su número de teléfono?",
+            "relationship": "¿Qué relación tiene contigo?",
+            "relationshipPlaceholder": "Madre, Esposo..."
+        },
+        "button": "Completar perfil",
+        "next": "Continuar Paso",
+        "back": "Regresar",
+        "saving": "Finalizando..."
+    }
+}
