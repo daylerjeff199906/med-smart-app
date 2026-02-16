@@ -57,11 +57,11 @@ export const config = {
         // Skip all internal paths (_next)
         // Skip all static files
         "/((?!_next|api|.*\\..*).*)",
-        ROUTES.LOGIN,
-        ROUTES.REGISTER,
-        ROUTES.FORGOT_PASSWORD,
-        ROUTES.RESET_PASSWORD,
-        ROUTES.ONBOARDING,
-        ROUTES.DASHBOARD,
+        "/login",
+        "/register",
+        "/forgot-password",
+        "/reset-password",
+        "/onboarding",
+        "/intranet/:path*",
     ],
 };

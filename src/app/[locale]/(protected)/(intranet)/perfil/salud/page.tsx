@@ -30,8 +30,8 @@ export default async function HealthDataPage({ params }: HealthDataPageProps) {
   }
 
   const initialData: HealthDataInput = {
-    weight: healthData?.weight || "",
-    height: healthData?.height || "",
+    weight: healthData?.weight || undefined,
+    height: healthData?.height || undefined,
     bloodType: (healthData?.blood_type as HealthDataInput["bloodType"]) || undefined,
     allergies: healthData?.allergies || "",
     chronicConditions: healthData?.chronic_conditions || "",
