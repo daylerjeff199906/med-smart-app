@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Plus, Trash2, ShieldAlert } from "lucide-react"
+import { Plus, Trash2, ShieldAlert, Eye, EyeOff } from "lucide-react"
 import { updateEmergencyContactsAction } from "../actions/profile-actions"
 
 interface EmergencyContactsFormProps {
@@ -25,6 +25,7 @@ interface EmergencyContactsFormProps {
 
 export function EmergencyContactsForm({ defaultValues, locale = "es" }: EmergencyContactsFormProps) {
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+    const [isSensitiveDataVisible, setIsSensitiveDataVisible] = useState(false)
     
     const form = useForm<EmergencyContactsListInput>({
         resolver: zodResolver(emergencyContactsListSchema),
@@ -35,6 +36,14 @@ export function EmergencyContactsForm({ defaultValues, locale = "es" }: Emergenc
         control: form.control,
         name: "contacts",
     })
+
+    const renderObfuscatedValue = () => {
+        return (
+            <div className="h-12 bg-slate-100 rounded-md border border-slate-200 flex items-center px-4">
+                <span className="text-slate-400 text-sm">••••••</span>
+            </div>
+        )
+    }
 
     async function onSubmit(data: EmergencyContactsListInput) {
         setMessage(null)
@@ -65,9 +74,28 @@ export function EmergencyContactsForm({ defaultValues, locale = "es" }: Emergenc
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pb-6 border-b">
                 <div>
                     <h1 className="text-xl font-bold tracking-tight text-slate-900">Contactos de Emergencia</h1>
-                    <p className="text-sm text-slate-500 mt-1">Personas a las que contactar en caso de una emergencia médica.</p>
+                    <p className="text-sm text-slate-500 mt-1">Tu perfil salvavidas.</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex items-center gap-3">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsSensitiveDataVisible(!isSensitiveDataVisible)}
+                        className={`h-10 px-4 rounded-md font-medium text-xs uppercase tracking-wider gap-2 ${isSensitiveDataVisible ? "bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100" : ""}`}
+                    >
+                        {isSensitiveDataVisible ? (
+                            <>
+                                <EyeOff className="size-4" />
+                                Ocultar datos
+                            </>
+                        ) : (
+                            <>
+                                <Eye className="size-4" />
+                                Mostrar datos
+                            </>
+                        )}
+                    </Button>
                     <Button variant="outline" className="h-10 px-6 rounded-md font-medium text-xs uppercase tracking-wider" type="button">
                         Cancelar
                     </Button>
@@ -127,7 +155,11 @@ export function EmergencyContactsForm({ defaultValues, locale = "es" }: Emergenc
                                             <FormItem>
                                                 <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nombre Completo</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} placeholder="P. ej. María García" className="h-12 bg-white rounded-md text-sm border-slate-200" />
+                                                    {isSensitiveDataVisible ? (
+                                                        <Input {...field} placeholder="P. ej. María García" className="h-12 bg-white rounded-md text-sm border-slate-200" />
+                                                    ) : (
+                                                        renderObfuscatedValue()
+                                                    )}
                                                 </FormControl>
                                                 <FormMessage className="text-xs" />
                                             </FormItem>
@@ -141,7 +173,11 @@ export function EmergencyContactsForm({ defaultValues, locale = "es" }: Emergenc
                                             <FormItem>
                                                 <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Teléfono</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} placeholder="+51 123 456 789" className="h-12 bg-white rounded-md text-sm border-slate-200" />
+                                                    {isSensitiveDataVisible ? (
+                                                        <Input {...field} placeholder="+51 123 456 789" className="h-12 bg-white rounded-md text-sm border-slate-200" />
+                                                    ) : (
+                                                        renderObfuscatedValue()
+                                                    )}
                                                 </FormControl>
                                                 <FormMessage className="text-xs" />
                                             </FormItem>
@@ -155,7 +191,11 @@ export function EmergencyContactsForm({ defaultValues, locale = "es" }: Emergenc
                                             <FormItem className="col-span-2">
                                                 <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Parentesco / Relación</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} placeholder="P. ej. Madre, Hermano, Cónyuge..." className="h-12 bg-white rounded-md text-sm border-slate-200" />
+                                                    {isSensitiveDataVisible ? (
+                                                        <Input {...field} placeholder="P. ej. Madre, Hermano, Cónyuge..." className="h-12 bg-white rounded-md text-sm border-slate-200" />
+                                                    ) : (
+                                                        renderObfuscatedValue()
+                                                    )}
                                                 </FormControl>
                                                 <FormMessage className="text-xs" />
                                             </FormItem>

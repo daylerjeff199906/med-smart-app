@@ -6,10 +6,7 @@ export const metadata: Metadata = {
   description: "Sign in or create an account",
 };
 
-/**
- * Layout principal para páginas de autenticación
- * Implementa el diseño split-screen con soporte de i18n
- */
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return <AuthLayoutShell>{children}</AuthLayoutShell>;
 }

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from 'next/font/google'
-import '../globals.css'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,16 +27,15 @@ export const viewport: Viewport = {
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
 }
 
-export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
-  const { locale } = await params;
+export default async function LocaleLayout({ children }: LocaleLayoutProps) {
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html  suppressHydrationWarning>
       <body
         className={`${inter.className} bg-background antialiased`}
+
       >
         {children}
       </body>

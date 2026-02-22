@@ -22,7 +22,8 @@
             "button": "Create Account",
             "haveAccount": "Already have an account?",
             "login": "Sign in",
-            "acceptTerms": "I accept the terms and conditions",
+            "acceptTerms": "I accept the terms and conditions and the processing of my health data to personalize my medical experience in Bequi.",
+            "privacyNote": "Note: Bequi is a management tool and does not replace the advice, diagnosis, or treatment of a medical professional.",
             "requirements": {
                 "length": "At least 8 characters",
                 "uppercase": "One uppercase letter",
@@ -102,5 +103,86 @@
         "next": "Continue Step",
         "back": "Back",
         "saving": "Saving..."
+    },
+    "medication": {
+        "title": "My Medicine Cabinet",
+        "subtitle": "Manage your medications and remember to take them on time.",
+        "addMedication": "Add Medication",
+        "editMedication": "Edit Medication",
+        "noMedications": "No medications registered",
+        "noMedicationsDesc": "Add your first medication to start tracking your treatment.",
+        "form": {
+            "name": "Medication name",
+            "namePlaceholder": "E.g. Acetaminophen",
+            "form": "Form",
+            "formPlaceholder": "Select the form",
+            "dose": "Dose",
+            "doseAmount": "Amount",
+            "doseUnit": "Unit",
+            "frequency": "Frequency",
+            "frequencyPlaceholder": "Select the frequency",
+            "timesOfDay": "Times of day",
+            "specificTimes": "Specific times",
+            "instructions": "Instructions",
+            "instructionsPlaceholder": "E.g. Take with water after meals",
+            "stock": "Inventory",
+            "currentStock": "Current stock",
+            "lowStockThreshold": "Low stock threshold",
+            "expirationDate": "Expiration date",
+            "startDate": "Start date",
+            "endDate": "End date (optional)",
+            "notifyViaEmail": "Notify via email",
+            "syncToCalendar": "Sync to calendar"
+        },
+        "frequency": {
+            "once_daily": "Once daily",
+            "twice_daily": "Twice daily",
+            "three_times_daily": "Three times daily",
+            "four_times_daily": "Four times daily",
+            "every_x_hours": "Every X hours",
+            "as_needed": "As needed",
+            "weekly": "Weekly",
+            "specific_days": "Specific days"
+        },
+        "formTypes": {
+            "tablet": "Tablet",
+            "capsule": "Capsule",
+            "liquid": "Liquid",
+            "injection": "Injection",
+            "inhaler": "Inhaler",
+            "cream": "Cream",
+            "drops": "Drops",
+            "patch": "Patch",
+            "suppository": "Suppository",
+            "other": "Other"
+        },
+        "timeOfDay": {
+            "morning": "Morning",
+            "afternoon": "Afternoon",
+            "evening": "Evening",
+            "night": "Night",
+            "with_meals": "With meals",
+            "fasting": "Fasting",
+            "specific_time": "Specific time"
+        },
+        "status": {
+            "taken": "Taken",
+            "pending": "Pending",
+            "skipped": "Skipped",
+            "missed": "Missed",
+            "postponed": "Postponed"
+        },
+        "actions": {
+            "markAsTaken": "Mark as taken",
+            "markAsSkipped": "Skip",
+            "edit": "Edit",
+            "delete": "Delete",
+            "confirmDelete": "Are you sure you want to delete this medication?"
+        },
+        "stockAlert": "Low stock",
+        "expirationAlert": "Expiring soon",
+        "todaySchedule": "Today's schedule",
+        "history": "History",
+        "calendar": "Calendar"
     }
 }
