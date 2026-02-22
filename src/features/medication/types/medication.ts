@@ -60,7 +60,7 @@ export const medicationPlanSchema = z.object({
     prescriptionId: z.string().optional().nullable(),
     name: z.string().min(1, "Medication name is required").max(255),
     form: MedicationFormEnum,
-    doseAmount: z.number().positive("Dose must be positive"),
+    doseAmount: z.number().optional(),
     doseUnit: DoseUnitEnum,
     frequency: MedicationFrequencyEnum,
     frequencyInterval: z.number().optional(),

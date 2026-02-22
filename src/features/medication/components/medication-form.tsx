@@ -2,8 +2,6 @@
 
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { medicationPlanSchema, type MedicationPlanInput } from "../types/medication"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -24,36 +22,57 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { 
-    Pill, 
-    Plus, 
-    Calendar, 
-    Clock, 
-    AlertTriangle, 
-    Mail, 
-    CalendarDays,
-    X
-} from "lucide-react"
-import { createMedicationPlan, updateMedicationPlan, deleteMedicationPlan } from "../actions/medication-actions"
+import { Mail, CalendarDays, X } from "lucide-react"
+import { createMedicationPlan, updateMedicationPlan } from "../actions/medication-actions"
 
 interface MedicationFormProps {
-    defaultValues?: Partial<MedicationPlanInput>
+    defaultValues?: {
+        id?: string
+        name?: string
+        form?: string
+        doseAmount?: number
+        doseUnit?: string
+        frequency?: string
+        currentStock?: number
+        lowStockThreshold?: number
+        instructions?: string
+        startDate?: string
+        expirationDate?: string
+        notifyViaEmail?: boolean
+        syncToCalendar?: boolean
+    }
     onSuccess?: () => void
     onCancel?: () => void
     locale?: string
 }
 
-const formOptions = {
-    tablet: "Tablet",
-    capsule: "Capsule", 
-    liquid: "Liquid",
-    injection: "Injection",
-    inhaler: "Inhaler",
-    cream: "Cream",
-    drops: "Drops",
-    patch: "Patch",
-    suppository: "Suppository",
-    other: "Other"
+interface FormData {
+    userId: string
+    name: string
+    form: string
+    doseAmount: number
+    doseUnit: string
+    frequency: string
+    currentStock: number
+    lowStockThreshold: number
+    instructions: string
+    startDate: string
+    expirationDate: string
+    notifyViaEmail: boolean
+    syncToCalendar: boolean
+}
+
+const formOptions: Record<string, string> = {
+    tablet: "Tableta",
+    capsule: "Cápsula", 
+    liquid: "Líquido",
+    injection: "Inyección",
+    inhaler: "Inhalador",
+    cream: "Crema",
+    drops: "Gotas",
+    patch: "Parche",
+    suppository: "Supositorio",
+    other: "Otro"
 }
 
 const doseUnits = [
@@ -69,56 +88,46 @@ const doseUnits = [
 ]
 
 const frequencies = [
-    { value: "once_daily", label: "Once daily" },
-    { value: "twice_daily", label: "Twice daily" },
-    { value: "three_times_daily", label: "Three times daily" },
-    { value: "four_times_daily", label: "Four times daily" },
-    { value: "every_x_hours", label: "Every X hours" },
-    { value: "as_needed", label: "As needed" },
-    { value: "weekly", label: "Weekly" },
-    { value: "specific_days", label: "Specific days" }
+    { value: "once_daily", label: "Una vez al día" },
+    { value: "twice_daily", label: "Dos veces al día" },
+    { value: "three_times_daily", label: "Tres veces al día" },
+    { value: "four_times_daily", label: "Cuatro veces al día" },
+    { value: "every_x_hours", label: "Cada X horas" },
+    { value: "as_needed", label: "Según necesidad" },
+    { value: "weekly", label: "Semanal" },
+    { value: "specific_days", label: "Días específicos" }
 ]
 
-const timesOfDay = [
-    { value: "morning", label: "Morning", icon: "🌅" },
-    { value: "afternoon", label: "Afternoon", icon: "☀️" },
-    { value: "evening", label: "Evening", icon: "🌆" },
-    { value: "night", label: "Night", icon: "🌙" },
-    { value: "with_meals", label: "With meals", icon: "🍽️" },
-    { value: "fasting", label: "Fasting", icon: "💧" }
-]
-
-export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "es" }: MedicationFormProps) {
+export function MedicationForm({ defaultValues, onSuccess, onCancel }: MedicationFormProps) {
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
     const [isLoading, setIsLoading] = useState(false)
 
-    const form = useForm<MedicationPlanInput>({
-        resolver: zodResolver(medicationPlanSchema),
+    const form = useForm<FormData>({
         defaultValues: {
             userId: "",
-            name: "",
-            form: "tablet",
-            doseAmount: 0,
-            doseUnit: "mg",
-            frequency: "once_daily",
-            currentStock: 0,
-            lowStockThreshold: 10,
-            isActive: true,
-            notifyViaEmail: false,
-            syncToCalendar: false,
-            startDate: new Date().toISOString().split("T")[0],
-            ...defaultValues
+            name: defaultValues?.name || "",
+            form: defaultValues?.form || "tablet",
+            doseAmount: defaultValues?.doseAmount || 0,
+            doseUnit: defaultValues?.doseUnit || "mg",
+            frequency: defaultValues?.frequency || "once_daily",
+            currentStock: defaultValues?.currentStock || 0,
+            lowStockThreshold: defaultValues?.lowStockThreshold || 10,
+            instructions: defaultValues?.instructions || "",
+            startDate: defaultValues?.startDate || new Date().toISOString().split("T")[0],
+            expirationDate: defaultValues?.expirationDate || "",
+            notifyViaEmail: defaultValues?.notifyViaEmail || false,
+            syncToCalendar: defaultValues?.syncToCalendar || false,
         }
     })
 
-    async function onSubmit(data: MedicationPlanInput) {
+    async function onSubmit(data: FormData) {
         setIsLoading(true)
         setMessage(null)
 
         try {
             const result = defaultValues?.id 
-                ? await updateMedicationPlan(defaultValues.id, data)
-                : await createMedicationPlan(data, data.userId)
+                ? await updateMedicationPlan(defaultValues.id, data as any)
+                : await createMedicationPlan(data as any, data.userId)
 
             if (result.success) {
                 setMessage({ type: "success", text: defaultValues?.id ? "Medicamento actualizado" : "Medicamento agregado" })
@@ -167,11 +176,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                             <FormItem>
                                 <FormLabel className="text-sm font-bold text-slate-900">Nombre del medicamento</FormLabel>
                                 <FormControl>
-                                    <Input 
-                                        {...field} 
-                                        placeholder="Ej. Paracetamol" 
-                                        className="h-12 bg-white rounded-md text-sm border-slate-200" 
-                                    />
+                                    <Input {...field} placeholder="Ej. Paracetamol" className="h-12 bg-white rounded-md text-sm border-slate-200" />
                                 </FormControl>
                                 <FormMessage className="text-xs" />
                             </FormItem>
@@ -193,9 +198,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                         </FormControl>
                                         <SelectContent>
                                             {Object.entries(formOptions).map(([value, label]) => (
-                                                <SelectItem key={value} value={value} className="rounded-lg">
-                                                    {label}
-                                                </SelectItem>
+                                                <SelectItem key={value} value={value} className="rounded-lg">{label}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -218,9 +221,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                         </FormControl>
                                         <SelectContent>
                                             {frequencies.map(freq => (
-                                                <SelectItem key={freq.value} value={freq.value} className="rounded-lg">
-                                                    {freq.label}
-                                                </SelectItem>
+                                                <SelectItem key={freq.value} value={freq.value} className="rounded-lg">{freq.label}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -238,13 +239,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                 <FormItem>
                                     <FormLabel className="text-sm font-bold text-slate-900">Dosis</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="number"
-                                            step="0.1"
-                                            {...field}
-                                            onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
-                                            className="h-12 bg-white rounded-md text-sm border-slate-200"
-                                        />
+                                        <Input type="number" step="0.1" {...field} className="h-12 bg-white rounded-md text-sm border-slate-200" />
                                     </FormControl>
                                     <FormMessage className="text-xs" />
                                 </FormItem>
@@ -265,9 +260,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                         </FormControl>
                                         <SelectContent>
                                             {doseUnits.map(unit => (
-                                                <SelectItem key={unit.value} value={unit.value} className="rounded-lg">
-                                                    {unit.label}
-                                                </SelectItem>
+                                                <SelectItem key={unit.value} value={unit.value} className="rounded-lg">{unit.label}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -285,12 +278,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                 <FormItem>
                                     <FormLabel className="text-sm font-bold text-slate-900">Stock actual</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="number"
-                                            {...field}
-                                            onChange={e => field.onChange(parseInt(e.target.value) || 0)}
-                                            className="h-12 bg-white rounded-md text-sm border-slate-200"
-                                        />
+                                        <Input type="number" {...field} className="h-12 bg-white rounded-md text-sm border-slate-200" />
                                     </FormControl>
                                     <FormMessage className="text-xs" />
                                 </FormItem>
@@ -304,12 +292,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                 <FormItem>
                                     <FormLabel className="text-sm font-bold text-slate-900">Umbral bajo</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="number"
-                                            {...field}
-                                            onChange={e => field.onChange(parseInt(e.target.value) || 0)}
-                                            className="h-12 bg-white rounded-md text-sm border-slate-200"
-                                        />
+                                        <Input type="number" {...field} className="h-12 bg-white rounded-md text-sm border-slate-200" />
                                     </FormControl>
                                     <FormMessage className="text-xs" />
                                 </FormItem>
@@ -324,11 +307,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                             <FormItem>
                                 <FormLabel className="text-sm font-bold text-slate-900">Instrucciones</FormLabel>
                                 <FormControl>
-                                    <Textarea 
-                                        {...field} 
-                                        placeholder="Ej. Tomar con agua después de comer" 
-                                        className="min-h-[80px] bg-white rounded-md text-sm border-slate-200 resize-none" 
-                                    />
+                                    <Textarea {...field} placeholder="Ej. Tomar con agua después de comer" className="min-h-[80px] bg-white rounded-md text-sm border-slate-200 resize-none" />
                                 </FormControl>
                                 <FormMessage className="text-xs" />
                             </FormItem>
@@ -343,11 +322,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                 <FormItem>
                                     <FormLabel className="text-sm font-bold text-slate-900">Fecha inicio</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="date"
-                                            {...field}
-                                            className="h-12 bg-white rounded-md text-sm border-slate-200"
-                                        />
+                                        <Input type="date" {...field} className="h-12 bg-white rounded-md text-sm border-slate-200" />
                                     </FormControl>
                                     <FormMessage className="text-xs" />
                                 </FormItem>
@@ -361,12 +336,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                 <FormItem>
                                     <FormLabel className="text-sm font-bold text-slate-900">Fecha caducidad</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="date"
-                                            {...field}
-                                            value={field.value || ""}
-                                            className="h-12 bg-white rounded-md text-sm border-slate-200"
-                                        />
+                                        <Input type="date" {...field} className="h-12 bg-white rounded-md text-sm border-slate-200" />
                                     </FormControl>
                                     <FormMessage className="text-xs" />
                                 </FormItem>
@@ -388,9 +358,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                     </FormControl>
                                     <div className="flex items-center gap-2">
                                         <Mail className="size-4 text-slate-500" />
-                                        <FormLabel className="text-sm font-medium text-slate-700 cursor-pointer">
-                                            Notificar por email (Resend)
-                                        </FormLabel>
+                                        <FormLabel className="text-sm font-medium text-slate-700 cursor-pointer">Notificar por email</FormLabel>
                                     </div>
                                 </FormItem>
                             )}
@@ -409,9 +377,7 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
                                     </FormControl>
                                     <div className="flex items-center gap-2">
                                         <CalendarDays className="size-4 text-slate-500" />
-                                        <FormLabel className="text-sm font-medium text-slate-700 cursor-pointer">
-                                            Sincronizar con calendario
-                                        </FormLabel>
+                                        <FormLabel className="text-sm font-medium text-slate-700 cursor-pointer">Sincronizar con calendario</FormLabel>
                                     </div>
                                 </FormItem>
                             )}
@@ -420,15 +386,9 @@ export function MedicationForm({ defaultValues, onSuccess, onCancel, locale = "e
 
                     <div className="flex gap-3 pt-4">
                         {onCancel && (
-                            <Button type="button" variant="outline" className="flex-1 h-12" onClick={onCancel}>
-                                Cancelar
-                            </Button>
+                            <Button type="button" variant="outline" className="flex-1 h-12" onClick={onCancel}>Cancelar</Button>
                         )}
-                        <Button 
-                            type="submit" 
-                            className="flex-1 h-12 bg-slate-900 hover:bg-slate-800 text-white"
-                            disabled={isLoading}
-                        >
+                        <Button type="submit" className="flex-1 h-12 bg-slate-900 hover:bg-slate-800 text-white" disabled={isLoading}>
                             {isLoading ? "Guardando..." : defaultValues?.id ? "Actualizar" : "Agregar"}
                         </Button>
                     </div>

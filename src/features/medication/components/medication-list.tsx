@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Pill, Clock, Calendar, AlertTriangle, MoreVertical, Edit, Trash2, Check, X } from "lucide-react"
+import { Pill, Clock, Calendar, AlertTriangle, MoreVertical, Edit, Trash2, Check, X, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { 
     medicationPlanSchema, 
