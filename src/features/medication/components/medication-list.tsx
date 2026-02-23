@@ -1,20 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { Pill, Clock, Calendar, AlertTriangle, MoreVertical, Edit, Trash2, Check, X, Plus } from "lucide-react"
+import { Pill, Clock, Calendar, AlertTriangle, Edit, Trash2, Check, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { 
-    medicationPlanSchema, 
-    type MedicationPlanInput,
-    type MedicationForm,
-    type DoseUnit,
-    type MedicationFrequency 
-} from "../types/medication"
-import { 
-    markMedicationAsTaken, 
-    deleteMedicationPlan,
-    updateStock 
-} from "../actions/medication-actions"
+import type { MedicationForm, DoseUnit, MedicationFrequency } from "../types/medication"
 
 interface Medication {
     id: string
@@ -41,7 +29,6 @@ interface MedicationCardProps {
     onEdit?: (medication: Medication) => void
     onDelete?: (id: string) => void
     onMarkTaken?: (id: string) => void
-    locale?: string
 }
 
 const formLabels: Record<string, string> = {
@@ -68,11 +55,18 @@ const frequencyLabels: Record<string, string> = {
     specific_days: "Días específicos"
 }
 
-export function MedicationCard({ medication, onEdit, onDelete, onMarkTaken, locale = "es" }: MedicationCardProps) {
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
+
+function getIsExpiringSoon(expirationDate: string | null | undefined): boolean {
+    if (!expirationDate) return false
+    const expirationTime = new Date(expirationDate).getTime()
+    return expirationTime <= (Date.now() + THIRTY_DAYS_MS)
+}
+
+export function MedicationCard({ medication, onEdit, onDelete, onMarkTaken }: MedicationCardProps) {
     const [showActions, setShowActions] = useState(false)
     const isLowStock = medication.current_stock <= medication.low_stock_threshold
-    const isExpiringSoon = medication.expiration_date && 
-        new Date(medication.expiration_date) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    const isExpiringSoon = getIsExpiringSoon(medication.expiration_date)
 
     return (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative group">
@@ -190,10 +184,9 @@ interface MedicationListProps {
     onDelete?: (id: string) => void
     onMarkTaken?: (id: string) => void
     onAdd?: () => void
-    locale?: string
 }
 
-export function MedicationList({ medications, onEdit, onDelete, onMarkTaken, onAdd, locale = "es" }: MedicationListProps) {
+export function MedicationList({ medications, onEdit, onDelete, onMarkTaken, onAdd }: MedicationListProps) {
     if (medications.length === 0) {
         return (
             <div className="bg-slate-50 rounded-[32px] p-12 text-center border-2 border-dashed border-slate-200">
@@ -223,7 +216,6 @@ export function MedicationList({ medications, onEdit, onDelete, onMarkTaken, onA
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onMarkTaken={onMarkTaken}
-                    locale={locale}
                 />
             ))}
         </div>

@@ -1,7 +1,6 @@
 "use server"
 
 import { createClient } from "@/utils/supabase/server"
-import { getSession } from "@/lib/session"
 import { revalidatePath } from "next/cache"
 import { medicationPlanSchema, medicationLogSchema, type MedicationPlanInput, type MedicationLogInput } from "../types/medication"
 
@@ -83,14 +82,15 @@ export async function createMedicationPlan(data: MedicationPlanInput, userId: st
         .select()
         .single()
 
+        console.log("createMedicationPlan result:", { plan, error })
+
     if (error) {
         console.error("Error creating medication plan:", error)
         return { success: false, error: error.message }
     }
 
-    revalidatePath("/es/perfil")
-    revalidatePath("/en/perfil")
-    
+    revalidatePath("/es/dashboard/medicamentos")
+    revalidatePath("/en/dashboard/medicamentos")
     return { success: true, data: plan }
 }
 
