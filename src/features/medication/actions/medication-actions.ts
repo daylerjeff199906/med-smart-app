@@ -436,3 +436,66 @@ export async function updateStock(planId: string, newStock: number) {
     
     return { success: true, data }
 }
+
+export async function getTodaySchedule(userId: string, date?: string) {
+    const supabase = await createClient()
+    
+    const targetDate = date || new Date().toISOString().split("T")[0]
+
+    const { data: medications, error } = await supabase
+        .from("medication_plans")
+        .select(`
+            *,
+            medication_logs (
+                id,
+                scheduled_date,
+                scheduled_time,
+                actual_taken_time,
+                status,
+                notes,
+                dose_taken,
+                missed_reason
+            )
+        `)
+        .eq("user_id", userId)
+        .eq("is_active", true)
+        .lte("start_date", targetDate)
+        .or(`end_date.is.null,end_date.gte.${targetDate}`)
+        .order("created_at", { ascending: true })
+
+    if (error) {
+        console.error("Error fetching today's schedule:", error)
+        return { success: false, error: error.message, data: null }
+    }
+
+    return { success: true, data: medications || [] }
+}
+
+export async function markMedicationAsSkipped(
+    logId: string,
+    reason?: string
+) {
+    const supabase = await createClient()
+    
+    const { data: log, error } = await supabase
+        .from("medication_logs")
+        .update({
+            status: "skipped",
+            missed_reason: reason || null,
+        })
+        .eq("id", logId)
+        .select()
+        .single()
+
+    if (error) {
+        console.error("Error marking medication as skipped:", error)
+        return { success: false, error: error.message }
+    }
+
+    revalidatePath("/es/perfil")
+    revalidatePath("/en/perfil")
+    revalidatePath("/es/intranet/medicamentos/agenda")
+    revalidatePath("/en/intranet/medicamentos/agenda")
+    
+    return { success: true, data: log }
+}

@@ -11,6 +11,8 @@ interface Medication {
     dose_amount: number
     dose_unit: DoseUnit
     frequency: MedicationFrequency
+    frequency_interval?: number | null
+    frequency_days?: number[] | null
     specific_times?: string[] | null
     times_of_day?: string[] | null
     instructions?: string | null
@@ -55,6 +57,27 @@ const frequencyLabels: Record<string, string> = {
     specific_days: "Días específicos"
 }
 
+const dayLabels: Record<number, string> = {
+    0: "Domingo",
+    1: "Lunes",
+    2: "Martes",
+    3: "Miércoles",
+    4: "Jueves",
+    5: "Viernes",
+    6: "Sábado"
+}
+
+function getFrequencyLabel(frequency: string, interval?: number | null, days?: number[] | null): string {
+    if (frequency === "every_x_hours" && interval) {
+        return `Cada ${interval} horas`
+    }
+    if (frequency === "specific_days" && days && days.length > 0) {
+        const dayNames = days.map(d => dayLabels[d] || "").filter(Boolean)
+        return dayNames.join(", ")
+    }
+    return frequencyLabels[frequency] || frequency
+}
+
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
 
 function getIsExpiringSoon(expirationDate: string | null | undefined): boolean {
@@ -68,87 +91,101 @@ export function MedicationCard({ medication, onEdit, onDelete, onMarkTaken }: Me
     const isExpiringSoon = getIsExpiringSoon(medication.expiration_date)
 
     return (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative group">
-            <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <Pill className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-slate-900 text-lg">{medication.name}</h3>
-                        <p className="text-sm text-slate-500">
-                            {medication.dose_amount} {medication.dose_unit} • {formLabels[medication.form] || medication.form}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                            <Clock className="w-3 h-3 text-slate-400" />
-                            <span className="text-xs text-slate-400">{frequencyLabels[medication.frequency] || medication.frequency}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    {isLowStock && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 rounded-lg">
-                            <AlertTriangle className="w-3 h-3 text-amber-500" />
-                            <span className="text-xs text-amber-600 font-medium">{medication.current_stock} uds</span>
-                        </div>
-                    )}
-                    {isExpiringSoon && (
-                        <div className="flex items-center gap-1 px-2 py-1 bg-red-50 rounded-lg">
-                            <Calendar className="w-3 h-3 text-red-500" />
-                            <span className="text-xs text-red-600 font-medium">Caduca</span>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {medication.instructions && (
-                <p className="mt-3 text-sm text-slate-500 bg-slate-50 rounded-lg p-2">
-                    {medication.instructions}
-                </p>
-            )}
-
-            <div className="mt-4 flex items-center justify-between pt-3 border-t border-slate-100">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="bg-slate-50 px-4 py-3 flex items-center justify-between border-b border-slate-100">
                 <div className="flex items-center gap-3">
-                    {medication.notify_via_email && (
-                        <span className="text-xs text-slate-400 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-                            Email
-                        </span>
-                    )}
-                    {medication.sync_to_calendar && (
-                        <span className="text-xs text-slate-400 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                            Calendar
-                        </span>
-                    )}
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Pill className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex flex-col">
+                        <h3 className="font-bold text-slate-900 text-sm">{medication.name}</h3>
+                        {isLowStock && (
+                            <span className="text-xs text-amber-600">Stock bajo: {medication.current_stock} uds</span>
+                        )}
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                <div className="flex items-center gap-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-slate-400 hover:text-slate-600 hover:bg-slate-200"
                         onClick={() => onEdit?.(medication)}
                         title="Editar"
                     >
                         <Edit className="w-4 h-4" />
                     </Button>
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
+                    <Button
+                        variant="ghost"
+                        size="icon"
                         className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50"
                         onClick={() => onDelete?.(medication.id)}
                         title="Eliminar"
                     >
                         <Trash2 className="w-4 h-4" />
                     </Button>
-                    <Button 
+                    {/* <Button 
                         className="h-8 px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-medium"
                         onClick={() => onMarkTaken?.(medication.id)}
                     >
                         <Check className="w-3 h-3 mr-1" />
                         Tomado
-                    </Button>
+                    </Button> */}
+                </div>
+            </div>
+
+            <div className="p-4 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <p className="text-xs text-slate-400 uppercase tracking-wide">Dosis</p>
+                        <p className="text-sm font-medium text-slate-700">{medication.dose_amount} {medication.dose_unit}</p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-slate-400 uppercase tracking-wide">Forma</p>
+                        <p className="text-sm font-medium text-slate-700">{formLabels[medication.form] || medication.form}</p>
+                    </div>
+                    <div className="col-span-2">
+                        <p className="text-xs text-slate-400 uppercase tracking-wide">Frecuencia</p>
+                        <p className="text-sm font-medium text-slate-700">
+                            {getFrequencyLabel(medication.frequency, medication.frequency_interval, medication.frequency_days)}
+                        </p>
+                    </div>
+                </div>
+
+                {(medication.specific_times || medication.times_of_day) && (
+                    <div>
+                        <p className="text-xs text-slate-400 uppercase tracking-wide">Horarios</p>
+                        <p className="text-sm font-medium text-slate-700">
+                            {(medication.specific_times || medication.times_of_day)?.join(", ")}
+                        </p>
+                    </div>
+                )}
+
+                {medication.instructions && (
+                    <div>
+                        <p className="text-xs text-slate-400 uppercase tracking-wide">Instrucciones</p>
+                        <p className="text-sm text-slate-600">{medication.instructions}</p>
+                    </div>
+                )}
+
+                <div className="flex items-center gap-4 pt-2 border-t border-slate-100">
+                    {isExpiringSoon && (
+                        <div className="flex items-center gap-1 text-red-600 text-xs">
+                            <Calendar className="w-3 h-3" />
+                            <span>Caduca pronto</span>
+                        </div>
+                    )}
+                    {medication.notify_via_email && (
+                        <span className="text-xs text-slate-400 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                            Notificaciones email
+                        </span>
+                    )}
+                    {medication.sync_to_calendar && (
+                        <span className="text-xs text-slate-400 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                            Sincronizado
+                        </span>
+                    )}
                 </div>
             </div>
         </div>
