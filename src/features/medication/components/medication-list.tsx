@@ -64,7 +64,6 @@ function getIsExpiringSoon(expirationDate: string | null | undefined): boolean {
 }
 
 export function MedicationCard({ medication, onEdit, onDelete, onMarkTaken }: MedicationCardProps) {
-    const [showActions, setShowActions] = useState(false)
     const isLowStock = medication.current_stock <= medication.low_stock_threshold
     const isExpiringSoon = getIsExpiringSoon(medication.expiration_date)
 
@@ -91,61 +90,15 @@ export function MedicationCard({ medication, onEdit, onDelete, onMarkTaken }: Me
                     {isLowStock && (
                         <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 rounded-lg">
                             <AlertTriangle className="w-3 h-3 text-amber-500" />
-                            <span className="text-xs text-amber-600 font-medium">{medication.current_stock} unidades</span>
+                            <span className="text-xs text-amber-600 font-medium">{medication.current_stock} uds</span>
                         </div>
                     )}
                     {isExpiringSoon && (
                         <div className="flex items-center gap-1 px-2 py-1 bg-red-50 rounded-lg">
                             <Calendar className="w-3 h-3 text-red-500" />
-                            <span className="text-xs text-red-600 font-medium">Caduca pronto</span>
+                            <span className="text-xs text-red-600 font-medium">Caduca</span>
                         </div>
                     )}
-                    
-                    <div className="relative">
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => setShowActions(!showActions)}
-                        >
-                            <MoreVertical className="w-4 h-4" />
-                        </Button>
-
-                        {showActions && (
-                            <div className="absolute right-0 top-10 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-10 min-w-[140px]">
-                                <button
-                                    onClick={() => {
-                                        onEdit?.(medication)
-                                        setShowActions(false)
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                    Editar
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        onMarkTaken?.(medication.id)
-                                        setShowActions(false)
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 text-green-600"
-                                >
-                                    <Check className="w-4 h-4" />
-                                    Marcar tomado
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        onDelete?.(medication.id)
-                                        setShowActions(false)
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 text-red-600"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                    Eliminar
-                                </button>
-                            </div>
-                        )}
-                    </div>
                 </div>
             </div>
 
@@ -170,8 +123,32 @@ export function MedicationCard({ medication, onEdit, onDelete, onMarkTaken }: Me
                         </span>
                     )}
                 </div>
-                <div className="text-xs text-slate-400">
-                    Stock: {medication.current_stock}
+                <div className="flex items-center gap-2">
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                        onClick={() => onEdit?.(medication)}
+                        title="Editar"
+                    >
+                        <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                        onClick={() => onDelete?.(medication.id)}
+                        title="Eliminar"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                        className="h-8 px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-medium"
+                        onClick={() => onMarkTaken?.(medication.id)}
+                    >
+                        <Check className="w-3 h-3 mr-1" />
+                        Tomado
+                    </Button>
                 </div>
             </div>
         </div>
