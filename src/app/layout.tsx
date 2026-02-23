@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "BEQUI",
     images: [
       {
-        url: "/og-image.png",
+        url: "/images/bequi_auth_bg.webp",
         width: 1200,
         height: 630,
         alt: "BEQUI App",
