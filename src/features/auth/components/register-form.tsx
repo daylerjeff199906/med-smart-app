@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, CheckCircle, Eye, EyeOff, XCircle, Check } from "lucide-react";
+import { Loader2, CheckCircle, Eye, EyeOff, XCircle, Check, HeartPulse } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { registerSchema, type RegisterInput } from "@/features/auth/types/auth";
@@ -261,18 +261,26 @@ export function RegisterForm() {
             control={form.control}
             name="acceptTerms"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center space-x-2 space-y-0 px-1">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isLoading}
-                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                  />
-                </FormControl>
-                <FormLabel className="text-xs font-medium text-muted-foreground cursor-pointer select-none">
-                  {t("auth.register.acceptTerms")}
-                </FormLabel>
+              <FormItem className="space-y-3 px-1">
+                <div className="flex flex-row items-start space-x-2">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isLoading}
+                      className="mt-1 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    />
+                  </FormControl>
+                  <FormLabel className="text-xs font-medium text-muted-foreground cursor-pointer select-none leading-relaxed">
+                    {t("auth.register.acceptTerms")}
+                  </FormLabel>
+                </div>
+                <div className="flex items-start gap-2 pl-6">
+                  <HeartPulse className="size-3.5 text-slate-400 mt-0.5 shrink-0" />
+                  <p className="text-[10px] text-slate-400">
+                    {t("auth.register.privacyNote")}
+                  </p>
+                </div>
                 <FormMessage />
               </FormItem>
             )}

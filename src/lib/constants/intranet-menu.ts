@@ -56,9 +56,14 @@ export const mainNavigation: NavSection[] = [
         icon: Stethoscope,
       },
       {
-        title: "Recetas",
-        url: "/intranet/recetas",
+        title: "Medicamentos",
+        url: "/intranet/medicamentos",
         icon: Pill,
+      },
+      {
+        title: "Agenda de Medicamentos",
+        url: "/intranet/medicamentos/agenda",
+        icon: Calendar,
       },
       {
         title: "Seguimiento",

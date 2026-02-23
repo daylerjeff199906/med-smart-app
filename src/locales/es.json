@@ -22,7 +22,8 @@
             "button": "Registrarse",
             "haveAccount": "¿Ya tienes una cuenta?",
             "login": "Inicia sesión",
-            "acceptTerms": "Acepto los términos y condiciones",
+            "acceptTerms": "Acepto los términos y condiciones y el tratamiento de mis datos de salud para personalizar mi experiencia médica en Bequi.",
+            "privacyNote": "Nota: Bequi es una herramienta de gestión y no reemplaza el consejo, diagnóstico o tratamiento de un médico profesional.",
             "requirements": {
                 "length": "Al menos 8 caracteres",
                 "uppercase": "Una letra mayúscula",
@@ -103,5 +104,86 @@
         "next": "Continuar Paso",
         "back": "Regresar",
         "saving": "Finalizando..."
+    },
+    "medication": {
+        "title": "Mi Pastillero",
+        "subtitle": "Gestiona tus medicamentos y recuerda tomarlos a tiempo.",
+        "addMedication": "Agregar Medicamento",
+        "editMedication": "Editar Medicamento",
+        "noMedications": "No tienes medicamentos registrados",
+        "noMedicationsDesc": "Agrega tu primer medicamento para comenzar a rastrear tu tratamiento.",
+        "form": {
+            "name": "Nombre del medicamento",
+            "namePlaceholder": "Ej. Paracetamol",
+            "form": "Forma",
+            "formPlaceholder": "Selecciona la forma",
+            "dose": "Dosis",
+            "doseAmount": "Cantidad",
+            "doseUnit": "Unidad",
+            "frequency": "Frecuencia",
+            "frequencyPlaceholder": "Selecciona la frecuencia",
+            "timesOfDay": "Momentos del día",
+            "specificTimes": "Horarios específicos",
+            "instructions": "Instrucciones",
+            "instructionsPlaceholder": "Ej. Tomar con agua después de comer",
+            "stock": "Inventario",
+            "currentStock": "Stock actual",
+            "lowStockThreshold": "Umbral de stock bajo",
+            "expirationDate": "Fecha de caducidad",
+            "startDate": "Fecha de inicio",
+            "endDate": "Fecha de fin (opcional)",
+            "notifyViaEmail": "Notificar por email",
+            "syncToCalendar": "Sincronizar con calendario"
+        },
+        "frequency": {
+            "once_daily": "Una vez al día",
+            "twice_daily": "Dos veces al día",
+            "three_times_daily": "Tres veces al día",
+            "four_times_daily": "Cuatro veces al día",
+            "every_x_hours": "Cada X horas",
+            "as_needed": "Según sea necesario",
+            "weekly": "Semanal",
+            "specific_days": "Días específicos"
+        },
+        "formTypes": {
+            "tablet": "Tableta",
+            "capsule": "Cápsula",
+            "liquid": "Líquido",
+            "injection": "Inyección",
+            "inhaler": "Inhalador",
+            "cream": "Crema",
+            "drops": "Gotas",
+            "patch": "Parche",
+            "suppository": "Supositorio",
+            "other": "Otro"
+        },
+        "timeOfDay": {
+            "morning": "Mañana",
+            "afternoon": "Tarde",
+            "evening": "Atardecer",
+            "night": "Noche",
+            "with_meals": "Con comidas",
+            "fasting": "En ayunas",
+            "specific_time": "Hora específica"
+        },
+        "status": {
+            "taken": "Tomado",
+            "pending": "Pendiente",
+            "skipped": "Omitido",
+            "missed": "Olvidado",
+            "postponed": "Pospuesto"
+        },
+        "actions": {
+            "markAsTaken": "Marcar como tomado",
+            "markAsSkipped": "Omitir",
+            "edit": "Editar",
+            "delete": "Eliminar",
+            "confirmDelete": "¿Estás seguro de eliminar este medicamento?"
+        },
+        "stockAlert": "Stock bajo",
+        "expirationAlert": "Próximo a caducar",
+        "todaySchedule": "Horario de hoy",
+        "history": "Historial",
+        "calendar": "Calendario"
     }
 }
