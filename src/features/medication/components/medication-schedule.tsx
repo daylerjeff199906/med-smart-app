@@ -48,6 +48,7 @@ interface DayScheduleProps {
     userId: string
     selectedDate: Date
     onRefresh: () => void
+    filter: "all" | "pending" | "taken" | "skipped"
 }
 
 type TimeSlot = "morning" | "afternoon" | "evening" | "night" | "specific"
@@ -305,13 +306,24 @@ function MedicationCard({
     )
 }
 
-function DaySchedule({ medications, userId, selectedDate, onRefresh }: DayScheduleProps) {
+function DaySchedule({ medications, userId, selectedDate, onRefresh, filter }: DayScheduleProps) {
     const dateStr = selectedDate.toISOString()
     const groups = groupMedicationsByTimeSlot(medications, dateStr)
 
     const order: TimeSlot[] = ["morning", "afternoon", "evening", "night", "specific"]
 
-    const hasAnyMedication = order.some(slot => groups[slot].length > 0)
+    const filteredGroups = Object.fromEntries(
+        Object.entries(groups).map(([slot, slots]) => [
+            slot,
+            slots.filter(slotItem => {
+                const status = slotItem.log?.status || "pending"
+                if (filter === "all") return true
+                return status === filter
+            })
+        ])
+    ) as Record<TimeSlot, MedicationSlot[]>
+
+    const hasAnyMedication = order.some(slot => filteredGroups[slot].length > 0)
 
     if (!hasAnyMedication) {
         return (
@@ -325,10 +337,10 @@ function DaySchedule({ medications, userId, selectedDate, onRefresh }: DaySchedu
     return (
         <div className="space-y-6">
             {order.map(slot => {
-                if (groups[slot].length === 0) return null
+                if (filteredGroups[slot].length === 0) return null
 
-                const takenCount = groups[slot].filter(s => s.log?.status === "taken").length
-                const total = groups[slot].length
+                const takenCount = filteredGroups[slot].filter(s => s.log?.status === "taken").length
+                const total = filteredGroups[slot].length
 
                 return (
                     <div key={slot}>
@@ -339,7 +351,7 @@ function DaySchedule({ medications, userId, selectedDate, onRefresh }: DaySchedu
                             </span>
                         </div>
                         <div className="space-y-2">
-                            {groups[slot].map((slotItem, idx) => (
+                            {filteredGroups[slot].map((slotItem, idx) => (
                                 <MedicationCard
                                     key={`${slotItem.plan.id}-${slotItem.time}-${idx}`}
                                     slot={slotItem}
@@ -359,7 +371,7 @@ export function MedicationSchedule({ userId }: { userId: string }) {
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [medications, setMedications] = useState<MedicationPlan[]>([])
     const [loading, setLoading] = useState(true)
-    const [stats, setStats] = useState({ taken: 0, pending: 0, skipped: 0, total: 0 })
+    const [filter, setFilter] = useState<"all" | "pending" | "taken" | "skipped">("all")
 
     const fetchSchedule = async () => {
         setLoading(true)
@@ -368,18 +380,6 @@ export function MedicationSchedule({ userId }: { userId: string }) {
 
         if (result.success && result.data) {
             setMedications(result.data)
-
-            let taken = 0, pending = 0, skipped = 0
-            result.data.forEach((plan: MedicationPlan) => {
-                plan.medication_logs?.forEach((log: MedicationLog) => {
-                    if (log.scheduled_date === dateStr) {
-                        if (log.status === "taken") taken++
-                        else if (log.status === "skipped") skipped++
-                        else if (log.status === "pending") pending++
-                    }
-                })
-            })
-            setStats({ taken, pending, skipped, total: taken + pending + skipped })
         }
         setLoading(false)
     }
@@ -406,6 +406,13 @@ export function MedicationSchedule({ userId }: { userId: string }) {
         })
     }
 
+    const filters: { value: "all" | "pending" | "taken" | "skipped"; label: string }[] = [
+        { value: "all", label: "Todos" },
+        { value: "pending", label: "Pendientes" },
+        { value: "taken", label: "Tomados" },
+        { value: "skipped", label: "Omitidos" },
+    ]
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -415,59 +422,20 @@ export function MedicationSchedule({ userId }: { userId: string }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card>
-                    <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                                <CheckCircle className="w-4 h-4 text-green-600" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold">{stats.taken}</p>
-                                <p className="text-xs text-slate-500">Tomados</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
-                                <Clock className="w-4 h-4 text-yellow-600" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold">{stats.pending}</p>
-                                <p className="text-xs text-slate-500">Pendientes</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                                <XCircle className="w-4 h-4 text-gray-600" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold">{stats.skipped}</p>
-                                <p className="text-xs text-slate-500">Omitidos</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                <Pill className="w-4 h-4 text-primary" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold">{stats.total}</p>
-                                <p className="text-xs text-slate-500">Total</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+            <div className="flex flex-wrap gap-2">
+                {filters.map((f) => (
+                    <button
+                        key={f.value}
+                        onClick={() => setFilter(f.value)}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                            filter === f.value
+                                ? "bg-slate-900 text-white"
+                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        }`}
+                    >
+                        {f.label}
+                    </button>
+                ))}
             </div>
 
             <Card>
@@ -511,6 +479,7 @@ export function MedicationSchedule({ userId }: { userId: string }) {
                             userId={userId}
                             selectedDate={selectedDate}
                             onRefresh={fetchSchedule}
+                            filter={filter}
                         />
                     )}
                 </CardContent>
