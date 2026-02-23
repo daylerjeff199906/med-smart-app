@@ -4,7 +4,7 @@ import { useState } from "react"
 import { MedicationList } from "./medication-list"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import { deleteMedicationPlan, markMedicationAsTaken } from "../actions/medication-actions"
+import { deleteMedicationPlan } from "../actions/medication-actions"
 import { useRouter } from "next/navigation"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { MedicationForm as MedForm, DoseUnit, MedicationFrequency } from "../types/medication"
@@ -16,6 +16,8 @@ interface Medication {
     dose_amount: number
     dose_unit: DoseUnit
     frequency: MedicationFrequency
+    frequency_interval?: number | null
+    frequency_days?: number[] | null
     specific_times?: string[] | null
     times_of_day?: string[] | null
     instructions?: string | null
@@ -61,13 +63,6 @@ export function MedicationPageContent({ initialMedications, userId, locale }: Me
     }
   }
 
-  const handleMarkTaken = async (id: string) => {
-    const today = new Date().toISOString().split("T")[0]
-    const medication = initialMedications.find(m => m.id === id)
-    await markMedicationAsTaken(id, userId, today, undefined, medication?.dose_amount)
-    router.refresh()
-  }
-
   return (
     <>
       <div className="p-6 space-y-6">
@@ -86,7 +81,6 @@ export function MedicationPageContent({ initialMedications, userId, locale }: Me
           medications={initialMedications}
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
-          onMarkTaken={handleMarkTaken}
           onAdd={handleAdd}
         />
       </div>

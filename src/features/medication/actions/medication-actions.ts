@@ -499,3 +499,51 @@ export async function markMedicationAsSkipped(
     
     return { success: true, data: log }
 }
+
+export async function restoreMedicationLog(logId: string) {
+    const supabase = await createClient()
+    
+    const { data: existingLog } = await supabase
+        .from("medication_logs")
+        .select("*, medication_plans(current_stock)")
+        .eq("id", logId)
+        .single()
+
+    if (!existingLog) {
+        return { success: false, error: "Log no encontrado" }
+    }
+
+    const { data: log, error } = await supabase
+        .from("medication_logs")
+        .update({
+            status: "pending",
+            actual_taken_time: null,
+            missed_reason: null,
+        })
+        .eq("id", logId)
+        .select()
+        .single()
+
+    if (error) {
+        console.error("Error restoring medication log:", error)
+        return { success: false, error: error.message }
+    }
+
+    if (existingLog.status === "taken" && existingLog.dose_taken) {
+        const plan = existingLog.medication_plans as { current_stock: number } | null
+        if (plan) {
+            const newStock = plan.current_stock + existingLog.dose_taken
+            await supabase
+                .from("medication_plans")
+                .update({ current_stock: newStock })
+                .eq("id", existingLog.plan_id)
+        }
+    }
+
+    revalidatePath("/es/perfil")
+    revalidatePath("/en/perfil")
+    revalidatePath("/es/intranet/medicamentos/agenda")
+    revalidatePath("/en/intranet/medicamentos/agenda")
+    
+    return { success: true, data: log }
+}

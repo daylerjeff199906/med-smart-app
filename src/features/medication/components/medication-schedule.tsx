@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getTodaySchedule, createMedicationLog, markMedicationAsSkipped } from "../actions/medication-actions"
+import { getTodaySchedule, markMedicationAsTaken, markMedicationAsSkipped, createMedicationLog, restoreMedicationLog } from "../actions/medication-actions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { MedicationLogDialog } from "@/components/ui/medication-log-dialog"
 import {
     CheckCircle,
     XCircle,
@@ -15,6 +16,7 @@ import {
     ChevronLeft,
     ChevronRight
 } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface MedicationLog {
     id: string
@@ -161,22 +163,30 @@ function MedicationCard({
 }) {
     const { plan, time, log } = slot
     const status = log?.status || "pending"
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [dialogType, setDialogType] = useState<"taken" | "skipped" | null>(null)
 
-    const handleTaken = async () => {
-        await createMedicationLog({
-            planId: plan.id,
-            userId: userId,
-            scheduledDate: new Date().toISOString().split("T")[0],
-            scheduledTime: time,
-            status: "taken",
-            doseTaken: plan.dose_amount,
-        }, userId)
+    const handleTaken = async (notes?: string) => {
+        await markMedicationAsTaken(
+            plan.id,
+            userId,
+            new Date().toISOString().split("T")[0],
+            time,
+            plan.dose_amount
+        )
+        if (notes) {
+            if (log?.id) {
+                const { updateMedicationLog } = await import("../actions/medication-actions")
+                await updateMedicationLog(log.id, { notes })
+            }
+        }
         onAction()
     }
 
-    const handleSkipped = async () => {
+    const handleSkipped = async (notes?: string) => {
+        const reason = notes || "Omitido por el usuario"
         if (log?.id) {
-            await markMedicationAsSkipped(log.id, "Omitido por el usuario")
+            await markMedicationAsSkipped(log.id, reason)
         } else {
             await createMedicationLog({
                 planId: plan.id,
@@ -184,61 +194,114 @@ function MedicationCard({
                 scheduledDate: new Date().toISOString().split("T")[0],
                 scheduledTime: time,
                 status: "skipped",
+                notes: notes || undefined,
             }, userId)
         }
         onAction()
     }
 
+    const handleOpenTaken = () => {
+        setDialogType("taken")
+        setDialogOpen(true)
+    }
+
+    const handleOpenSkipped = () => {
+        setDialogType("skipped")
+        setDialogOpen(true)
+    }
+
+    const handleDialogConfirm = (notes?: string) => {
+        if (dialogType === "taken") {
+            handleTaken(notes)
+        } else if (dialogType === "skipped") {
+            handleSkipped(notes)
+        }
+    }
+
+    const handleRestore = async () => {
+        if (log?.id) {
+            await restoreMedicationLog(log.id)
+            onAction()
+        }
+    }
+
     return (
-        <div className={`p-4 rounded-lg border ${status === 'taken' ? 'bg-green-50 border-green-200' : status === 'skipped' ? 'bg-gray-50 border-gray-200' : 'bg-white border-slate-200'}`}>
-            <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <Pill className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                        <h4 className="font-semibold text-slate-900">{plan.name}</h4>
-                        <p className="text-sm text-slate-600">
-                            {plan.dose_amount} {plan.dose_unit} • {plan.form}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                            <Clock className="w-3 h-3 text-slate-400" />
-                            <span className="text-xs text-slate-500">{time}</span>
+        <>
+            <div className={`p-4 rounded-lg border ${status === 'taken' ? 'bg-green-50 border-green-200' : status === 'skipped' ? 'bg-gray-50 border-gray-200' : 'bg-white border-slate-200'}`}>
+                <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <Pill className="w-5 h-5 text-primary" />
                         </div>
-                        {plan.instructions && (
-                            <p className="text-xs text-slate-400 mt-1">{plan.instructions}</p>
+                        <div>
+                            <h4 className="font-semibold text-slate-900">{plan.name}</h4>
+                            <p className="text-sm text-slate-600">
+                                {plan.dose_amount} {plan.dose_unit} • {plan.form}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                                <Clock className="w-3 h-3 text-slate-400" />
+                                <span className="text-xs text-slate-500">{time}</span>
+                            </div>
+                            {plan.instructions && (
+                                <p className="text-xs text-slate-400 mt-1">{plan.instructions}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col items-end gap-2">
+                        <StatusBadge status={status} />
+
+                        {status === "pending" && (
+                            <div className="flex items-center gap-1">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 text-green-600 border-green-200 hover:bg-green-50 hover:border-green-300 rounded-full"
+                                    onClick={handleOpenTaken}
+                                >
+                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                    Tomar
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 text-gray-500 border-gray-200 hover:bg-gray-50 rounded-full"
+                                    onClick={handleOpenSkipped}
+                                >
+                                    <XCircle className="w-3 h-3 mr-1" />
+                                    Omitir
+                                </Button>
+                            </div>
+                        )}
+                        
+                        {(status === "taken" || status === "skipped") && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 text-amber-600 border-amber-200 hover:bg-amber-50 hover:border-amber-300 rounded-full"
+                                onClick={handleRestore}
+                            >
+                                <AlertCircle className="w-3 h-3 mr-1" />
+                                Restaurar
+                            </Button>
                         )}
                     </div>
                 </div>
-
-                <div className="flex flex-col items-end gap-2">
-                    <StatusBadge status={status} />
-
-                    {status === "pending" && (
-                        <div className="flex items-center gap-1">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 text-green-600 border-green-200 hover:bg-green-50 hover:border-green-300 rounded-full"
-                                onClick={handleTaken}
-                            >
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                Tomar
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 text-gray-500 border-gray-200 hover:bg-gray-50 rounded-full"
-                                onClick={handleSkipped}
-                            >
-                                <XCircle className="w-3 h-3 mr-1" />
-                                Omitir
-                            </Button>
-                        </div>
-                    )}
-                </div>
             </div>
-        </div>
+
+            <MedicationLogDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                onConfirm={handleDialogConfirm}
+                title={dialogType === "taken" ? "Marcar como tomado" : "Omitir dosis"}
+                description={dialogType === "taken" 
+                    ? `¿Confirmas que tomaste ${plan.name} (${plan.dose_amount} ${plan.dose_unit})?` 
+                    : `¿Estás seguro de omitir la dosis de ${plan.name}?`
+                }
+                confirmText={dialogType === "taken" ? "Confirmar" : "Omitir"}
+                cancelText="Cancelar"
+            />
+        </>
     )
 }
 
@@ -437,7 +500,11 @@ export function MedicationSchedule({ userId }: { userId: string }) {
                 </CardHeader>
                 <CardContent className="pt-4">
                     {loading ? (
-                        <div className="text-center py-8 text-slate-500">Cargando...</div>
+                        <div className="flex flex-col gap-4">
+                            {Array.from({ length: 5 }).map((_, index) => (
+                                <Skeleton key={index} className="h-20 rounded-2xl" />
+                            ))}
+                        </div>
                     ) : (
                         <DaySchedule
                             medications={medications}

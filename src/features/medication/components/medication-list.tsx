@@ -30,7 +30,6 @@ interface MedicationCardProps {
     medication: Medication
     onEdit?: (medication: Medication) => void
     onDelete?: (id: string) => void
-    onMarkTaken?: (id: string) => void
 }
 
 const formLabels: Record<string, string> = {
@@ -86,7 +85,7 @@ function getIsExpiringSoon(expirationDate: string | null | undefined): boolean {
     return expirationTime <= (Date.now() + THIRTY_DAYS_MS)
 }
 
-export function MedicationCard({ medication, onEdit, onDelete, onMarkTaken }: MedicationCardProps) {
+export function MedicationCard({ medication, onEdit, onDelete }: MedicationCardProps) {
     const isLowStock = medication.current_stock <= medication.low_stock_threshold
     const isExpiringSoon = getIsExpiringSoon(medication.expiration_date)
 
@@ -123,13 +122,6 @@ export function MedicationCard({ medication, onEdit, onDelete, onMarkTaken }: Me
                     >
                         <Trash2 className="w-4 h-4" />
                     </Button>
-                    {/* <Button 
-                        className="h-8 px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-medium"
-                        onClick={() => onMarkTaken?.(medication.id)}
-                    >
-                        <Check className="w-3 h-3 mr-1" />
-                        Tomado
-                    </Button> */}
                 </div>
             </div>
 
@@ -196,11 +188,10 @@ interface MedicationListProps {
     medications: Medication[]
     onEdit?: (medication: Medication) => void
     onDelete?: (id: string) => void
-    onMarkTaken?: (id: string) => void
     onAdd?: () => void
 }
 
-export function MedicationList({ medications, onEdit, onDelete, onMarkTaken, onAdd }: MedicationListProps) {
+export function MedicationList({ medications, onEdit, onDelete, onAdd }: MedicationListProps) {
     if (medications.length === 0) {
         return (
             <div className="bg-slate-50 rounded-[32px] p-12 text-center border-2 border-dashed border-slate-200">
@@ -229,7 +220,6 @@ export function MedicationList({ medications, onEdit, onDelete, onMarkTaken, onA
                     medication={medication}
                     onEdit={onEdit}
                     onDelete={onDelete}
-                    onMarkTaken={onMarkTaken}
                 />
             ))}
         </div>

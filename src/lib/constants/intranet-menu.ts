@@ -63,7 +63,7 @@ export const mainNavigation: NavSection[] = [
       {
         title: "Agenda de Medicamentos",
         url: "/intranet/medicamentos/agenda",
-        icon: Pill,
+        icon: Calendar,
       },
       {
         title: "Seguimiento",
