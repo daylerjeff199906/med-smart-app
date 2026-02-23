@@ -229,13 +229,13 @@ function MedicationCard({
     return (
         <>
             <div className={`p-4 rounded-lg border ${status === 'taken' ? 'bg-green-50 border-green-200' : status === 'skipped' ? 'bg-gray-50 border-gray-200' : 'bg-white border-slate-200'}`}>
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start justify-between gap-3 flex-col md:flex-row">
                     <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <div className="hidden md:flex w-10 h-10 rounded-full bg-primary/10 items-center justify-center flex-shrink-0">
                             <Pill className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h4 className="font-semibold text-slate-900">{plan.name}</h4>
+                            <h4 className="font-semibold text-slate-900 text-sm md:text-base">{plan.name}</h4>
                             <p className="text-sm text-slate-600">
                                 {plan.dose_amount} {plan.dose_unit} • {plan.form}
                             </p>
@@ -247,10 +247,15 @@ function MedicationCard({
                                 <p className="text-xs text-slate-400 mt-1">{plan.instructions}</p>
                             )}
                         </div>
+                        <div className="md:hidden">
+                            <StatusBadge status={status} />
+                        </div>
                     </div>
 
                     <div className="flex flex-col items-end gap-2">
-                        <StatusBadge status={status} />
+                        <div className="hidden md:flex">
+                            <StatusBadge status={status} />
+                        </div>
 
                         {status === "pending" && (
                             <div className="flex items-center gap-1">
@@ -274,7 +279,7 @@ function MedicationCard({
                                 </Button>
                             </div>
                         )}
-                        
+
                         {(status === "taken" || status === "skipped") && (
                             <Button
                                 variant="outline"
@@ -295,8 +300,8 @@ function MedicationCard({
                 onOpenChange={setDialogOpen}
                 onConfirm={handleDialogConfirm}
                 title={dialogType === "taken" ? "Marcar como tomado" : "Omitir dosis"}
-                description={dialogType === "taken" 
-                    ? `¿Confirmas que tomaste ${plan.name} (${plan.dose_amount} ${plan.dose_unit})?` 
+                description={dialogType === "taken"
+                    ? `¿Confirmas que tomaste ${plan.name} (${plan.dose_amount} ${plan.dose_unit})?`
                     : `¿Estás seguro de omitir la dosis de ${plan.name}?`
                 }
                 confirmText={dialogType === "taken" ? "Confirmar" : "Omitir"}
@@ -417,7 +422,7 @@ export function MedicationSchedule({ userId }: { userId: string }) {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h2 className="text-lg font-bold text-slate-900">Agenda de Medicamentos</h2>
+                    <h2 className="text-xl font-bold text-slate-900">Agenda de Medicamentos</h2>
                     <p className="text-slate-500 text-sm">Visualiza y gestiona tus medicamentos del día</p>
                 </div>
             </div>
@@ -427,11 +432,10 @@ export function MedicationSchedule({ userId }: { userId: string }) {
                     <button
                         key={f.value}
                         onClick={() => setFilter(f.value)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                            filter === f.value
-                                ? "bg-slate-900 text-white"
-                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                        }`}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === f.value
+                            ? "bg-slate-900 text-white"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            }`}
                     >
                         {f.label}
                     </button>
