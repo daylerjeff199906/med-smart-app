@@ -11,16 +11,18 @@ import {
 } from "@/components/ui/breadcrumb"
 
 import { Input } from "@/components/ui/input"
-import { Search, Bell } from "lucide-react"
+import { Search } from "lucide-react"
+import { NotificationDropdown } from "@/features/notifications/components/notification-dropdown"
 import Link from "next/link"
 import { getLocalizedRoute } from "@/lib/routes"
 import { useTranslation } from "@/hooks/use-translation"
 
 interface SiteHeaderProps {
   sectionTitle?: string
+  userId: string
 }
 
-export function SiteHeader({ sectionTitle }: SiteHeaderProps) {
+export function SiteHeader({ sectionTitle, userId }: SiteHeaderProps) {
   const { locale } = useTranslation()
 
   return (
@@ -60,10 +62,9 @@ export function SiteHeader({ sectionTitle }: SiteHeaderProps) {
       </div>
 
       <div className="flex items-center gap-4 px-4">
-        <button className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
-          <Bell className="size-5" />
-          <span className="absolute top-1.5 right-1.5 size-2 bg-rose-500 rounded-full border-2 border-white" />
-        </button>
+        {userId && (
+          <NotificationDropdown userId={userId} locale={locale} />
+        )}
       </div>
     </header>
   )

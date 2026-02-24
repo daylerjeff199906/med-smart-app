@@ -8,6 +8,7 @@ export const ROUTES = {
     DASHBOARD: "/intranet",
     MEDICATION: "/intranet/medicamentos",
     ADD_MEDICATION: "/intranet/medicamentos/agregar",
+    NOTIFICATIONS: "/intranet/notificaciones",
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
