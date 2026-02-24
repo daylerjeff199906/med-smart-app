@@ -5,6 +5,7 @@ import { ROUTES, getLocalizedRoute } from "@/lib/routes"
 import { createClient } from "@/utils/supabase/server"
 import { LayoutWrapper } from "@/components/intranet/layout-wrapper"
 import { MedicationPageContent } from "@/features/medication/components/medication-page-content"
+import { searchMedications } from "@/features/medication/actions/medication-actions"
 
 export const metadata: Metadata = {
   title: "Medicamentos - Bequi",
@@ -12,36 +13,37 @@ export const metadata: Metadata = {
 }
 
 interface MedicamentosPageProps {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ q?: string; filter?: string }>
 }
 
-export default async function MedicamentosPage({ params }: MedicamentosPageProps) {
-  const { locale } = await params;
-  const session = await getSession();
+export default async function MedicamentosPage({ params, searchParams }: MedicamentosPageProps) {
+  const { locale } = await params
+  const { q, filter } = await searchParams
+
+  const session = await getSession()
 
   if (!session) {
-    redirect(getLocalizedRoute(ROUTES.LOGIN, locale));
+    redirect(getLocalizedRoute(ROUTES.REGISTER, locale))
   }
 
   if (!session.onboardingCompleted) {
-    redirect(getLocalizedRoute(ROUTES.ONBOARDING, locale));
+    redirect(getLocalizedRoute(ROUTES.ONBOARDING, locale))
   }
 
-  const supabase = await createClient();
-  
-  const { data: medications } = await supabase
-    .from("medication_plans")
-    .select("*")
-    .eq("user_id", session.user.id)
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
+  const filterValue = filter as "all" | "active" | "inactive" | "low_stock" | "expiring_soon" | undefined
+
+  const result = await searchMedications(
+    session.user.id,
+    q,
+    filterValue
+  )
 
   return (
     <LayoutWrapper sectionTitle="Medicamentos">
-      <MedicationPageContent 
-        initialMedications={medications || []} 
-        userId={session.user.id}
-        locale={locale} 
+      <MedicationPageContent
+        initialMedications={result.success ? (result.data || []) : []}
+        locale={locale}
       />
     </LayoutWrapper>
   )
