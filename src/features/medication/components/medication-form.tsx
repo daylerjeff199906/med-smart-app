@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,6 +26,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Mail, CalendarDays, X, Clock, Calendar, Package } from "lucide-react"
 import { createMedicationPlan, updateMedicationPlan } from "../actions/medication-actions"
 import { MedicationPlanInput } from "../types/medication"
+import { getLocalizedRoute, ROUTES } from "@/lib/routes"
 
 interface MedicationFormProps {
     userId: string
@@ -129,7 +131,8 @@ const timesOfDayOptions = [
     { value: "with_meals", label: "Con las comidas" }
 ]
 
-export function MedicationForm({ userId, medicationId, defaultValues, onSuccess, onCancel }: MedicationFormProps) {
+export function MedicationForm({ userId, medicationId, defaultValues, onSuccess, onCancel, locale }: MedicationFormProps) {
+    const router = useRouter()
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [specificTimeInput, setSpecificTimeInput] = useState("")
