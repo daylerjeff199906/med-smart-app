@@ -1,9 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getTodaySchedule } from "../actions/medication-actions"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { MedicationLogDialog } from "@/components/ui/medication-log-dialog"
 import {
@@ -11,12 +9,9 @@ import {
     XCircle,
     Clock,
     AlertCircle,
-    Pill,
     Calendar,
     ChevronLeft,
     ChevronRight,
-    ChevronDown,
-    ChevronUp
 } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 

@@ -14,7 +14,7 @@ function getZodErrorMessage(error: unknown): string {
 
 export async function getMedicationPlans(userId: string) {
     const supabase = await createClient()
-    
+
     const { data, error } = await supabase
         .from("medication_plans")
         .select("*")
@@ -31,32 +31,35 @@ export async function getMedicationPlans(userId: string) {
 }
 
 export async function searchMedications(
-    userId: string, 
-    searchQuery?: string, 
+    userId: string,
+    searchQuery?: string,
     filter?: "all" | "active" | "inactive" | "low_stock" | "expiring_soon"
 ) {
     console.log("searchMedications called with:", { userId, searchQuery, filter })
-    
+
     const supabase = await createClient()
-    
+
     let query = supabase
         .from("medication_plans")
         .select("*")
         .eq("user_id", userId)
+
+    // Filter by active status by default unless specifically asking for inactive
+    if (filter === "inactive") {
+        query = query.eq("is_active", false)
+    } else {
+        query = query.eq("is_active", true)
+    }
 
     if (searchQuery && searchQuery.trim()) {
         console.log("Applying search:", searchQuery.trim())
         query = query.ilike("name", `%${searchQuery.trim()}%`)
     }
 
-    if (filter && filter !== "all") {
-        console.log("Applying filter:", filter)
-        
-        if (filter === "active") {
-            query = query.eq("is_active", true)
-        } else if (filter === "inactive") {
-            query = query.eq("is_active", false)
-        } else if (filter === "low_stock") {
+    if (filter && filter !== "all" && filter !== "active" && filter !== "inactive") {
+        console.log("Applying special filter:", filter)
+
+        if (filter === "low_stock") {
             query = query.lte("current_stock", 10).gte("current_stock", 0)
         } else if (filter === "expiring_soon") {
             const thirtyDaysFromNow = new Date()
@@ -78,7 +81,7 @@ export async function searchMedications(
 
 export async function getMedicationPlanById(planId: string) {
     const supabase = await createClient()
-    
+
     const { data, error } = await supabase
         .from("medication_plans")
         .select("*")
@@ -95,7 +98,7 @@ export async function getMedicationPlanById(planId: string) {
 
 export async function createMedicationPlan(data: MedicationPlanInput, userId: string) {
     const supabase = await createClient()
-    
+
     const validation = medicationPlanSchema.safeParse(data)
     if (!validation.success) {
         return { success: false, error: getZodErrorMessage(validation.error) }
@@ -128,13 +131,15 @@ export async function createMedicationPlan(data: MedicationPlanInput, userId: st
         .select()
         .single()
 
-        console.log("createMedicationPlan result:", { plan, error })
+    console.log("createMedicationPlan result:", { plan, error })
 
     if (error) {
         console.error("Error creating medication plan:", error)
         return { success: false, error: error.message }
     }
 
+    revalidatePath("/es/intranet/medicamentos")
+    revalidatePath("/en/intranet/medicamentos")
     revalidatePath("/es/dashboard/medicamentos")
     revalidatePath("/en/dashboard/medicamentos")
     return { success: true, data: plan }
@@ -142,7 +147,7 @@ export async function createMedicationPlan(data: MedicationPlanInput, userId: st
 
 export async function updateMedicationPlan(planId: string, data: Partial<MedicationPlanInput>) {
     const supabase = await createClient()
-    
+
     const updateData: Record<string, unknown> = {
         name: data.name,
         form: data.form,
@@ -184,13 +189,15 @@ export async function updateMedicationPlan(planId: string, data: Partial<Medicat
 
     revalidatePath("/es/perfil")
     revalidatePath("/en/perfil")
-    
+    revalidatePath("/es/intranet/medicamentos")
+    revalidatePath("/en/intranet/medicamentos")
+
     return { success: true, data: plan }
 }
 
 export async function deleteMedicationPlan(planId: string) {
     const supabase = await createClient()
-    
+
     const { error } = await supabase
         .from("medication_plans")
         .update({ is_active: false })
@@ -203,13 +210,17 @@ export async function deleteMedicationPlan(planId: string) {
 
     revalidatePath("/es/perfil")
     revalidatePath("/en/perfil")
-    
+    revalidatePath("/es/intranet/medicamentos")
+    revalidatePath("/en/intranet/medicamentos")
+    revalidatePath("/es/intranet/medicamentos/agenda")
+    revalidatePath("/en/intranet/medicamentos/agenda")
+
     return { success: true }
 }
 
 export async function getMedicationLogs(userId: string, date?: string) {
     const supabase = await createClient()
-    
+
     const targetDate = date || new Date().toISOString().split("T")[0]
 
     const { data, error } = await supabase
@@ -237,7 +248,7 @@ export async function getMedicationLogs(userId: string, date?: string) {
 
 export async function getMedicationLogsByPlan(planId: string, startDate?: string, endDate?: string) {
     const supabase = await createClient()
-    
+
     let query = supabase
         .from("medication_logs")
         .select("*")
@@ -262,7 +273,7 @@ export async function getMedicationLogsByPlan(planId: string, startDate?: string
 
 export async function createMedicationLog(data: MedicationLogInput, userId: string) {
     const supabase = await createClient()
-    
+
     const validation = medicationLogSchema.safeParse(data)
     if (!validation.success) {
         return { success: false, error: getZodErrorMessage(validation.error) }
@@ -296,7 +307,7 @@ export async function createMedicationLog(data: MedicationLogInput, userId: stri
             .select("current_stock")
             .eq("id", data.planId)
             .single()
-        
+
         if (plan) {
             const newStock = Math.max(0, plan.current_stock - (data.doseTaken || 0))
             await supabase
@@ -308,13 +319,17 @@ export async function createMedicationLog(data: MedicationLogInput, userId: stri
 
     revalidatePath("/es/perfil")
     revalidatePath("/en/perfil")
-    
+    revalidatePath("/es/intranet/medicamentos")
+    revalidatePath("/en/intranet/medicamentos")
+    revalidatePath("/es/intranet/medicamentos/agenda")
+    revalidatePath("/en/intranet/medicamentos/agenda")
+
     return { success: true, data: log }
 }
 
 export async function updateMedicationLog(logId: string, data: Partial<MedicationLogInput>) {
     const supabase = await createClient()
-    
+
     const updateData: Record<string, unknown> = {
         actual_taken_time: data.actualTakenTime,
         status: data.status,
@@ -344,19 +359,23 @@ export async function updateMedicationLog(logId: string, data: Partial<Medicatio
 
     revalidatePath("/es/perfil")
     revalidatePath("/en/perfil")
-    
+    revalidatePath("/es/intranet/medicamentos")
+    revalidatePath("/en/intranet/medicamentos")
+    revalidatePath("/es/intranet/medicamentos/agenda")
+    revalidatePath("/en/intranet/medicamentos/agenda")
+
     return { success: true, data: log }
 }
 
 export async function markMedicationAsTaken(
-    planId: string, 
-    userId: string, 
-    scheduledDate: string, 
+    planId: string,
+    userId: string,
+    scheduledDate: string,
     scheduledTime?: string,
     doseTaken?: number
 ) {
     const supabase = await createClient()
-    
+
     const { data: existingLog } = await supabase
         .from("medication_logs")
         .select("id")
@@ -379,14 +398,14 @@ export async function markMedicationAsTaken(
         if (error) {
             return { success: false, error: error.message }
         }
-        
+
         if (doseTaken) {
             const { data: plan } = await supabase
                 .from("medication_plans")
                 .select("current_stock")
                 .eq("id", planId)
                 .single()
-            
+
             if (plan) {
                 const newStock = Math.max(0, plan.current_stock - doseTaken)
                 await supabase
@@ -398,7 +417,11 @@ export async function markMedicationAsTaken(
 
         revalidatePath("/es/perfil")
         revalidatePath("/en/perfil")
-        
+        revalidatePath("/es/intranet/medicamentos")
+        revalidatePath("/en/intranet/medicamentos")
+        revalidatePath("/es/intranet/medicamentos/agenda")
+        revalidatePath("/en/intranet/medicamentos/agenda")
+
         return { success: true, data: log }
     }
 
@@ -427,7 +450,7 @@ export async function markMedicationAsTaken(
             .select("current_stock")
             .eq("id", planId)
             .single()
-        
+
         if (plan) {
             const newStock = Math.max(0, plan.current_stock - doseTaken)
             await supabase
@@ -439,13 +462,17 @@ export async function markMedicationAsTaken(
 
     revalidatePath("/es/perfil")
     revalidatePath("/en/perfil")
-    
+    revalidatePath("/es/intranet/medicamentos")
+    revalidatePath("/en/intranet/medicamentos")
+    revalidatePath("/es/intranet/medicamentos/agenda")
+    revalidatePath("/en/intranet/medicamentos/agenda")
+
     return { success: true, data: log }
 }
 
 export async function getLowStockMedications(userId: string) {
     const supabase = await createClient()
-    
+
     const { data, error } = await supabase
         .from("medication_plans")
         .select("*")
@@ -464,7 +491,7 @@ export async function getLowStockMedications(userId: string) {
 
 export async function updateStock(planId: string, newStock: number) {
     const supabase = await createClient()
-    
+
     const { data, error } = await supabase
         .from("medication_plans")
         .update({ current_stock: newStock })
@@ -479,13 +506,15 @@ export async function updateStock(planId: string, newStock: number) {
 
     revalidatePath("/es/perfil")
     revalidatePath("/en/perfil")
-    
+    revalidatePath("/es/intranet/medicamentos")
+    revalidatePath("/en/intranet/medicamentos")
+
     return { success: true, data }
 }
 
 export async function getTodaySchedule(userId: string, date?: string) {
     const supabase = await createClient()
-    
+
     const targetDate = date || new Date().toISOString().split("T")[0]
 
     const { data: medications, error } = await supabase
@@ -522,7 +551,7 @@ export async function markMedicationAsSkipped(
     reason?: string
 ) {
     const supabase = await createClient()
-    
+
     const { data: log, error } = await supabase
         .from("medication_logs")
         .update({
@@ -540,15 +569,17 @@ export async function markMedicationAsSkipped(
 
     revalidatePath("/es/perfil")
     revalidatePath("/en/perfil")
+    revalidatePath("/es/intranet/medicamentos")
+    revalidatePath("/en/intranet/medicamentos")
     revalidatePath("/es/intranet/medicamentos/agenda")
     revalidatePath("/en/intranet/medicamentos/agenda")
-    
+
     return { success: true, data: log }
 }
 
 export async function restoreMedicationLog(logId: string) {
     const supabase = await createClient()
-    
+
     const { data: existingLog } = await supabase
         .from("medication_logs")
         .select("*, medication_plans(current_stock)")
@@ -588,8 +619,10 @@ export async function restoreMedicationLog(logId: string) {
 
     revalidatePath("/es/perfil")
     revalidatePath("/en/perfil")
+    revalidatePath("/es/intranet/medicamentos")
+    revalidatePath("/en/intranet/medicamentos")
     revalidatePath("/es/intranet/medicamentos/agenda")
     revalidatePath("/en/intranet/medicamentos/agenda")
-    
+
     return { success: true, data: log }
 }
