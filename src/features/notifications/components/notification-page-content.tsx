@@ -5,8 +5,8 @@ import { Bell, Check, Filter, Search, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { NotificationItem } from "./notification-item"
-import { type Notification, type NotificationFilters } from "../types/notifications"
-import { markAsRead, markAllAsRead } from "../actions/notification-actions"
+import { type Notification, type NotificationFilters } from "@/features/notifications/types/notifications"
+import { markAsRead, markAllAsRead } from "@/features/notifications/actions/notification-actions"
 import { cn } from "@/lib/utils"
 
 interface NotificationPageContentProps {

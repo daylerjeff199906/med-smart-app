@@ -11,8 +11,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { getNotifications, getUnreadNotificationsCount, markAsRead, markAllAsRead } from "../actions/notification-actions"
-import { type Notification } from "../types/notifications"
+import { getNotifications, getUnreadNotificationsCount, markAsRead, markAllAsRead } from "@/features/notifications/actions/notification-actions"
+import { type Notification } from "@/features/notifications/types/notifications"
 import { NotificationItem } from "./notification-item"
 import { useRouter } from "next/navigation"
 import { ROUTES, getLocalizedRoute } from "@/lib/routes"
