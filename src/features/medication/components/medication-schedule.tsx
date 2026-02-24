@@ -402,6 +402,20 @@ function CalendarSidebar({
         return date.toDateString() === new Date().toDateString()
     }
 
+    const isFuture = (date: Date) => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        return date > today
+    }
+
+    const canGoNextMonth = () => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        // Can go next only if currentMonth's year/month is before today's year/month
+        return currentMonth.getFullYear() < today.getFullYear() ||
+            (currentMonth.getFullYear() === today.getFullYear() && currentMonth.getMonth() < today.getMonth())
+    }
+
     return (
         <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100">
             <div className="mb-6">
@@ -425,12 +439,13 @@ function CalendarSidebar({
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-full hover:bg-slate-100"
+                            className="h-8 w-8 rounded-full hover:bg-slate-100 disabled:opacity-20"
                             onClick={() => {
                                 const next = new Date(currentMonth)
                                 next.setMonth(next.getMonth() + 1)
                                 setCurrentMonth(next)
                             }}
+                            disabled={!canGoNextMonth()}
                         >
                             <ChevronRight className="w-4 h-4" />
                         </Button>
@@ -446,6 +461,7 @@ function CalendarSidebar({
                             {date ? (
                                 <button
                                     onClick={() => onDateSelect(date)}
+                                    disabled={isFuture(date)}
                                     className={`
                                         w-full h-full rounded-2xl text-xs font-bold transition-all duration-200
                                         ${isDateSelected(date)
@@ -453,6 +469,7 @@ function CalendarSidebar({
                                             : "text-slate-700 hover:bg-slate-50"}
                                         ${!isDateSelected(date) && isToday(date) ? "text-primary border border-primary/20" : ""}
                                         ${!isDateSelected(date) && hasMedication(date) ? "relative after:content-[''] after:absolute after:bottom-1.5 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-primary after:rounded-full" : ""}
+                                        ${isFuture(date) ? "opacity-20 cursor-not-allowed" : ""}
                                     `}
                                 >
                                     {date.getDate()}
