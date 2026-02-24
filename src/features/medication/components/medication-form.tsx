@@ -76,7 +76,7 @@ interface FormData {
 
 const formOptions: Record<string, string> = {
     tablet: "Tableta",
-    capsule: "Cápsula", 
+    capsule: "Cápsula",
     liquid: "Líquido",
     injection: "Inyección",
     inhaler: "Inhalador",
@@ -251,14 +251,18 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
         }
 
         try {
-            const result = medicationId 
+            const result = medicationId
                 ? await updateMedicationPlan(medicationId, planData)
                 : await createMedicationPlan(planData, data.userId)
 
             if (result.success) {
                 setMessage({ type: "success", text: medicationId ? "Medicamento actualizado" : "Medicamento agregado" })
                 setTimeout(() => {
-                    onSuccess?.()
+                    if (onSuccess) {
+                        onSuccess()
+                    } else {
+                        router.push(getLocalizedRoute(ROUTES.MEDICATION, locale || "es"))
+                    }
                 }, 1000)
             } else {
                 setMessage({ type: "error", text: result.error || "Error al guardar" })
@@ -270,6 +274,14 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
         }
     }
 
+    const handleCancel = () => {
+        if (onCancel) {
+            onCancel()
+        } else {
+            router.push(getLocalizedRoute(ROUTES.MEDICATION, locale || "es"))
+        }
+    }
+
     const isEditing = !!medicationId
 
     return (
@@ -278,11 +290,9 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                 <h2 className="text-xl font-bold text-slate-900">
                     {isEditing ? "Editar Medicamento" : "Agregar Medicamento"}
                 </h2>
-                {onCancel && (
-                    <Button variant="ghost" size="icon" onClick={onCancel}>
-                        <X className="size-4" />
-                    </Button>
-                )}
+                <Button variant="ghost" size="icon" onClick={handleCancel}>
+                    <X className="size-4" />
+                </Button>
             </div>
 
             {message && (
@@ -300,7 +310,7 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                             <Package className="w-4 h-4" />
                             <span className="text-xs font-medium">Información del medicamento</span>
                         </div>
-                        
+
                         <FormField
                             control={form.control}
                             name="name"
@@ -370,16 +380,16 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                                 <FormItem>
                                     <FormLabel className="text-sm font-bold text-slate-900">Dosis por toma *</FormLabel>
                                     <FormControl>
-                                        <Input 
-                                            type="number" 
-                                            step="0.1" 
+                                        <Input
+                                            type="number"
+                                            step="0.1"
                                             min="0"
-                                            value={field.value} 
+                                            value={field.value}
                                             onChange={(e) => {
                                                 const val = parseFloat(e.target.value)
                                                 field.onChange(isNaN(val) ? 1 : val)
                                             }}
-                                            className="h-12 bg-white rounded-md text-sm border-slate-200" 
+                                            className="h-12 bg-white rounded-md text-sm border-slate-200"
                                         />
                                     </FormControl>
                                     <FormMessage className="text-xs" />
@@ -426,13 +436,13 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                                     <FormItem>
                                         <FormLabel className="text-sm font-bold text-slate-900">Intervalo (horas)</FormLabel>
                                         <FormControl>
-                                            <Input 
-                                                type="number" 
+                                            <Input
+                                                type="number"
                                                 min="1"
                                                 max="24"
-                                                value={field.value} 
+                                                value={field.value}
                                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 8)}
-                                                className="h-12 bg-white rounded-md text-sm border-slate-200" 
+                                                className="h-12 bg-white rounded-md text-sm border-slate-200"
                                             />
                                         </FormControl>
                                         <FormMessage className="text-xs" />
@@ -451,11 +461,10 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                                             key={day.value}
                                             type="button"
                                             onClick={() => toggleWeekDay(day.value)}
-                                            className={`w-12 h-12 rounded-lg border text-sm font-medium transition-colors ${
-                                                (form.watch("frequencyDays") || []).includes(day.value)
-                                                    ? "bg-primary border-primary text-white"
-                                                    : "bg-white border-slate-200 text-slate-700 hover:border-primary"
-                                            }`}
+                                            className={`w-12 h-12 rounded-lg border text-sm font-medium transition-colors ${(form.watch("frequencyDays") || []).includes(day.value)
+                                                ? "bg-primary border-primary text-white"
+                                                : "bg-white border-slate-200 text-slate-700 hover:border-primary"
+                                                }`}
                                         >
                                             {day.label}
                                         </button>
@@ -471,11 +480,10 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                                 {timesOfDayOptions.map(option => (
                                     <label
                                         key={option.value}
-                                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
-                                            (form.watch("timesOfDay") || []).includes(option.value)
-                                                ? "bg-primary/10 border-primary text-primary"
-                                                : "bg-white border-slate-200 text-slate-700"
-                                        }`}
+                                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${(form.watch("timesOfDay") || []).includes(option.value)
+                                            ? "bg-primary/10 border-primary text-primary"
+                                            : "bg-white border-slate-200 text-slate-700"
+                                            }`}
                                     >
                                         <Checkbox
                                             checked={(form.watch("timesOfDay") || []).includes(option.value)}
@@ -492,8 +500,8 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                             <FormLabel className="text-sm font-bold text-slate-900">Horarios específicos</FormLabel>
                             <p className="text-xs text-slate-400 mb-2">Agrega horas específicas (ej. 08:00, 14:00, 20:00)</p>
                             <div className="flex gap-2">
-                                <Input 
-                                    type="time" 
+                                <Input
+                                    type="time"
                                     value={specificTimeInput}
                                     onChange={(e) => setSpecificTimeInput(e.target.value)}
                                     className="h-12 bg-white rounded-md text-sm border-slate-200"
@@ -571,12 +579,12 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                                     <FormItem>
                                         <FormLabel className="text-sm font-bold text-slate-900">Stock actual</FormLabel>
                                         <FormControl>
-                                            <Input 
-                                                type="number" 
+                                            <Input
+                                                type="number"
                                                 min="0"
-                                                value={field.value} 
+                                                value={field.value}
                                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                                className="h-12 bg-white rounded-md text-sm border-slate-200" 
+                                                className="h-12 bg-white rounded-md text-sm border-slate-200"
                                             />
                                         </FormControl>
                                         <FormMessage className="text-xs" />
@@ -591,12 +599,12 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                                     <FormItem>
                                         <FormLabel className="text-sm font-bold text-slate-900">Alerta de stock bajo</FormLabel>
                                         <FormControl>
-                                            <Input 
-                                                type="number" 
+                                            <Input
+                                                type="number"
                                                 min="0"
-                                                value={field.value} 
+                                                value={field.value}
                                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                                className="h-12 bg-white rounded-md text-sm border-slate-200" 
+                                                className="h-12 bg-white rounded-md text-sm border-slate-200"
                                             />
                                         </FormControl>
                                         <FormMessage className="text-xs" />
@@ -676,9 +684,7 @@ export function MedicationForm({ userId, medicationId, defaultValues, onSuccess,
                     </div>
 
                     <div className="flex gap-3 pt-4">
-                        {onCancel && (
-                            <Button type="button" variant="outline" className="flex-1 h-12" onClick={onCancel}>Cancelar</Button>
-                        )}
+                        <Button type="button" variant="outline" className="flex-1 h-12" onClick={handleCancel}>Cancelar</Button>
                         <Button type="submit" className="flex-1 h-12 bg-slate-900 hover:bg-slate-800 text-white" disabled={isLoading}>
                             {isLoading ? "Guardando..." : medicationId ? "Actualizar" : "Agregar"}
                         </Button>
