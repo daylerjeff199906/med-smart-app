@@ -2,6 +2,8 @@
 
 import { Plus, ClipboardList, Microscope, Pill, Bell, ChevronRight, Activity } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useRouter } from "next/navigation"
+import { ROUTES, getLocalizedRoute } from "@/lib/routes"
 
 interface DashboardContentProps {
     profile: any;
@@ -9,7 +11,8 @@ interface DashboardContentProps {
 }
 
 export function DashboardContent({ profile, locale }: DashboardContentProps) {
-    const name = profile?.first_name || "Usuario";
+    const router = useRouter();
+    const name = profile?.first_name || "Usuario"
     const healthData = profile?.health_data;
 
     // Fecha actual formateada
@@ -45,7 +48,10 @@ export function DashboardContent({ profile, locale }: DashboardContentProps) {
                                 Esperamos que estés bien. ¿En qué podemos ayudarte hoy?
                             </p>
                             <div className="pt-2">
-                                <button className="bg-white/20 hover:bg-white/30 p-2.5 rounded-2xl transition-all border border-white/20 backdrop-blur-sm group">
+                                <button
+                                    onClick={() => router.push(getLocalizedRoute(ROUTES.ADD_MEDICATION, locale))}
+                                    className="bg-white/20 hover:bg-white/30 p-2.5 rounded-2xl transition-all border border-white/20 backdrop-blur-sm group"
+                                >
                                     <Plus className="size-5 group-hover:rotate-90 transition-transform duration-300" />
                                 </button>
                             </div>
@@ -85,11 +91,15 @@ export function DashboardContent({ profile, locale }: DashboardContentProps) {
                 {/* Quick Actions Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[
-                        { icon: ClipboardList, label: 'Diagnósticos', sub: 'Lista de condiciones', color: 'bg-teal-50 text-teal-600', border: 'border-teal-100' },
-                        { icon: Microscope, label: 'Exámenes', sub: 'Archivo de pruebas', color: 'bg-blue-50 text-blue-600', border: 'border-blue-100' },
-                        { icon: Pill, label: 'Medicamentos', sub: 'Recetas activas', color: 'bg-orange-50 text-orange-600', border: 'border-orange-100' }
+                        { icon: ClipboardList, label: 'Diagnósticos', sub: 'Lista de condiciones', color: 'bg-teal-50 text-teal-600', border: 'border-teal-100', route: null },
+                        { icon: Microscope, label: 'Exámenes', sub: 'Archivo de pruebas', color: 'bg-blue-50 text-blue-600', border: 'border-blue-100', route: null },
+                        { icon: Pill, label: 'Medicamentos', sub: 'Recetas activas', color: 'bg-orange-50 text-orange-600', border: 'border-orange-100', route: ROUTES.MEDICATION }
                     ].map((action, i) => (
-                        <div key={i} className={`bg-white rounded-[32px] p-6 shadow-sm border ${action.border} flex items-center gap-4 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group`}>
+                        <div
+                            key={i}
+                            onClick={() => action.route && router.push(getLocalizedRoute(action.route, locale))}
+                            className={`bg-white rounded-[32px] p-6 shadow-sm border ${action.border} flex items-center gap-4 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group`}
+                        >
                             <div className={`p-4 rounded-[20px] ${action.color} group-hover:scale-110 transition-transform duration-300`}>
                                 <action.icon className="size-6" />
                             </div>
@@ -190,11 +200,15 @@ export function DashboardContent({ profile, locale }: DashboardContentProps) {
 
                     <div className="space-y-6">
                         {[
-                            { title: 'Cita - Dr. Rogan', date: 'Mañana, 10:30 AM', color: 'bg-rose-50 text-rose-500', icon: Bell },
-                            { title: 'Medicina - Vitamina D', date: 'En 2 horas', color: 'bg-blue-50 text-blue-500', icon: Pill },
-                            { title: 'Análisis - Ayunas', date: 'Jueves, 07:00 AM', color: 'bg-teal-50 text-teal-500', icon: Activity }
+                            { title: 'Cita - Dr. Rogan', date: 'Mañana, 10:30 AM', color: 'bg-rose-50 text-rose-500', icon: Bell, route: null },
+                            { title: 'Medicina - Vitamina D', date: 'En 2 horas', color: 'bg-blue-50 text-blue-500', icon: Pill, route: ROUTES.MEDICATION },
+                            { title: 'Análisis - Ayunas', date: 'Jueves, 07:00 AM', color: 'bg-teal-50 text-teal-500', icon: Activity, route: null }
                         ].map((rem, i) => (
-                            <div key={i} className="flex items-center gap-4 group cursor-pointer">
+                            <div
+                                key={i}
+                                onClick={() => rem.route && router.push(getLocalizedRoute(rem.route, locale))}
+                                className={`flex items-center gap-4 group cursor-pointer ${!rem.route ? 'cursor-default' : ''}`}
+                            >
                                 <div className={`size-14 rounded-[20px] flex items-center justify-center ${rem.color} group-hover:scale-110 transition-all duration-300 shadow-sm border border-black/5`}>
                                     <rem.icon className="size-6" />
                                 </div>

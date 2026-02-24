@@ -6,6 +6,8 @@ export const ROUTES = {
     RESET_PASSWORD: "/reset-password",
     ONBOARDING: "/onboarding",
     DASHBOARD: "/intranet",
+    MEDICATION: "/intranet/medicamentos",
+    ADD_MEDICATION: "/intranet/medicamentos/agregar",
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
