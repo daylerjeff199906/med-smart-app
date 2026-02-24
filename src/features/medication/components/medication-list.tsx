@@ -2,29 +2,9 @@
 
 import { Pill, Clock, Calendar, AlertTriangle, Edit, Trash2, Check, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { MedicationForm, DoseUnit, MedicationFrequency } from "../types/medication"
+import type { Medication } from "./medication-filters"
 
-interface Medication {
-    id: string
-    name: string
-    form: MedicationForm
-    dose_amount: number
-    dose_unit: DoseUnit
-    frequency: MedicationFrequency
-    frequency_interval?: number | null
-    frequency_days?: number[] | null
-    specific_times?: string[] | null
-    times_of_day?: string[] | null
-    instructions?: string | null
-    current_stock: number
-    low_stock_threshold: number
-    expiration_date?: string | null
-    start_date: string
-    end_date?: string | null
-    notify_via_email: boolean
-    sync_to_calendar: boolean
-    is_active: boolean
-}
+export type { Medication }
 
 interface MedicationCardProps {
     medication: Medication

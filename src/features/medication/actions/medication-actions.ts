@@ -30,6 +30,52 @@ export async function getMedicationPlans(userId: string) {
     return { success: true, data }
 }
 
+export async function searchMedications(
+    userId: string, 
+    searchQuery?: string, 
+    filter?: "all" | "active" | "inactive" | "low_stock" | "expiring_soon"
+) {
+    console.log("searchMedications called with:", { userId, searchQuery, filter })
+    
+    const supabase = await createClient()
+    
+    let query = supabase
+        .from("medication_plans")
+        .select("*")
+        .eq("user_id", userId)
+
+    if (searchQuery && searchQuery.trim()) {
+        console.log("Applying search:", searchQuery.trim())
+        query = query.ilike("name", `%${searchQuery.trim()}%`)
+    }
+
+    if (filter && filter !== "all") {
+        console.log("Applying filter:", filter)
+        
+        if (filter === "active") {
+            query = query.eq("is_active", true)
+        } else if (filter === "inactive") {
+            query = query.eq("is_active", false)
+        } else if (filter === "low_stock") {
+            query = query.lte("current_stock", 10).gte("current_stock", 0)
+        } else if (filter === "expiring_soon") {
+            const thirtyDaysFromNow = new Date()
+            thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
+            query = query.lte("expiration_date", thirtyDaysFromNow.toISOString()).not("expiration_date", "is", null)
+        }
+    }
+
+    const { data, error } = await query.order("created_at", { ascending: false })
+
+    if (error) {
+        console.error("Error searching medications:", error)
+        return { success: false, error: error.message, data: null }
+    }
+
+    console.log("Found medications:", data?.length)
+    return { success: true, data }
+}
+
 export async function getMedicationPlanById(planId: string) {
     const supabase = await createClient()
     

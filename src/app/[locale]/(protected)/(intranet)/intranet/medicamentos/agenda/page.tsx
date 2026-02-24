@@ -28,7 +28,7 @@ export default async function AgendaPage({ params }: AgendaPageProps) {
 
   return (
     <LayoutWrapper sectionTitle="Agenda de Medicamentos">
-      <div className="p-6">
+      <div className="py-6 w-full">
         <MedicationSchedule userId={session.user.id} />
       </div>
     </LayoutWrapper>
