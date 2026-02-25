@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 import { medicationPlanSchema, medicationLogSchema, type MedicationPlanInput, type MedicationLogInput } from "../types/medication"
+import { createNotification } from "@/features/notifications/actions/notification-actions"
 
 function getZodErrorMessage(error: unknown): string {
     if (error && typeof error === 'object' && 'errors' in error) {
@@ -137,6 +138,15 @@ export async function createMedicationPlan(data: MedicationPlanInput, userId: st
         console.error("Error creating medication plan:", error)
         return { success: false, error: error.message }
     }
+
+    // Crear notificación de bienvenida al nuevo plan
+    await createNotification({
+        userId,
+        title: "Nuevo plan de medicación",
+        message: `Se ha registrado correctamente el medicamento: ${data.name}`,
+        type: "system",
+        referenceId: plan.id
+    })
 
     revalidatePath("/es/intranet/medicamentos")
     revalidatePath("/en/intranet/medicamentos")
